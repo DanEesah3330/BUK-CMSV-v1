@@ -10,69 +10,89 @@
 </head>
 
 <body class="bg-slate-100 font-sans text-slate-800">
-    <header class="bg-blue-800 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3 ">
-                <i class="fa-solid fa-notes-medical text-3xl text-blue-300"></i>
-                <div>
-                    <h1 class="font-bold text-base leading-tight tracking-wide">BUK-CMS</h1>
-                    <p class="text-xs text-blue-200">New Campus Health Services</p>
-                </div>
-            </div>
+    
 
-            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
-                <button id="nav-home" onclick="showSection('view-home')"
-                    class="hover:text-blue-200 font-semibold transition">Home</button>
-                <button id="nav-reports" onclick="viewReports()"
-                    class="hidden hover:text-blue-200 font-semibold transition">Reports</button>
-            </nav>
+<header class="bg-blue-500 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 
-            <div class="flex items-center space-x-3">
-                <div id="role-badge"
-                    class="hidden bg-blue-900 border border-blue-600 text-blue-200 text-xs px-3 py-1.5 rounded-full items-center">
-                    <i class="fa-solid fa-user-circle mr-1.5"></i> Role: <strong id="current-role-title"
-                        class="ml-1 text-white">Receptionist</strong>
-                </div>
-                <button id="btn-login-toggle" onclick="showSection('login-section')"
-                    class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-4 py-2 rounded font-semibold transition shadow">
-                    <i class="fa-solid fa-right-to-bracket mr-1"></i> Staff Login
-                </button>
+        <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-notes-medical text-3xl text-blue-100"></i>
+            <div>
+                <h1 class="font-bold text-base leading-tight tracking-wide">BUK-CMS</h1>
+                <p class="text-xs text-blue-100">New Campus Health Services</p>
             </div>
         </div>
 
-    </header>
+        <nav class="hidden md:flex items-center space-x-5 text-sm font-medium">
+            <button id="nav-reports" onclick="viewReports()"
+                class="hidden hover:text-blue-200 transition">
+                Reports
+            </button>
+        </nav>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+
+            <div id="role-badge"
+                class="hidden bg-blue-900 border border-blue-500 text-blue-100 text-xs px-3 py-1.5 rounded-full items-center">
+                <i class="fa-solid fa-user-circle mr-1.5"></i>
+                Role: <strong id="current-role-title" class="ml-1 text-white">Staff</strong>
+            </div>
+                <!-- Student Login -->
+                <button
+                    onclick="showSection('student-login-section')"
+                    class="bg-white hover:bg-blue-200 text-blue-700 text-sm px-4 py-2.5 rounded-lg font-semibold transition shadow">
+                    <i class="fa-solid fa-user-graduate mr-1"></i>
+                    Student Login
+                </button>
+
+                <!-- Staff Login -->
+                <button
+                    onclick="showSection('login-section')"
+                    class="bg-blue-700 hover:bg-blue-800 text-white text-sm px-4 py-2.5 rounded-lg font-semibold transition shadow">
+                    <i class="fa-solid fa-right-to-bracket mr-1"></i>
+                    Staff Login
+                </button>
+
+        </div>
+    </div>
+</header>
+
 
     <!-- 1: HERO / HOME PAGE -->
     <main id="view-home" class="block">
 
         <!-- SECTION 1 -->
-        <section class="bg-gradient-to-r from-blue-900 via-blue-800 to-sky-900 text-white py-20 px-4">
+        <section class="bg-gradient-to-r from-blue-500 via-blue-300 to-sky-200 text-white py-20 px-4">
             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div class="space-y-8">
                     <span
-                        class="bg-blue-700/60 text-blue-200 text-xs font-semibold px-3 py-1 rounded-full border border-blue-500/30">
+                        class="bg-blue-700/60 text-blue-100 text-xs font-semibold px-3 py-1 rounded-full border border-blue-500/30">
                         Official BUK Health Portal
                     </span>
                     <h2 class="text-3xl md:text-5xl font-extrabold leading-tight">
                         Quality Healthcare Services for BUK Students
                     </h2>
-                    <p class="text-blue-100 text-sm md:text-base">
+                    <p class="text-white text-sm md:text-base font-semibold">
                         Welcome to the Bayero University Kano (New Campus) Digital Clinic System. Providing fast,
                         paperless, and secure medical care and record management for all students.
                     </p>
                     <div class="pt-4 md:py-12 flex flex-wrap gap-3">
                         <button onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})"
-                            class="bg-white text-blue-900 hover:bg-blue-50 px-5 py-2.5 rounded-lg font-bold text-base shadow transition">
+                            class="bg-white text-blue-700 hover:bg-blue-200 px-2 py-2.5 rounded-lg font-bold text-base shadow transition">
                             See how a visit works <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                        <button id="btn-login-toggle" onclick="showSection('login-section')"
+                            class="bg-white hover:bg-blue-200 text-blue-700 text-base px-4 py-2.5 rounded-lg font-semibold transition shadow">
+                            <i class="fa-solid fa-right-to-bracket mr-1"></i>  Login
                         </button>
                     </div>
                 </div>
                 <div class="block md:flex justify-center">
                     <div
-                        class="bg-blue-800/50 border border-blue-600/50 p-6 rounded-2xl shadow-xl backdrop-blur-sm max-w-sm text-center">
+                        class="bg-blue-600/50 border border-blue-600/50 p-6 rounded-2xl shadow-xl backdrop-blur-sm max-w-sm text-center">
                         <i class="fa-solid fa-user-doctor text-3xl md:text-7xl text-blue-300 mb-4"></i>
                         <h3 class="text-lg font-bold">Fast & Efficient Care</h3>
-                        <p class="text-xs text-blue-200 mt-2">
+                        <p class="text-xs text-blue-100 mt-2">
                             Seamless workflow from Reception to Nurse Triage, Doctor Consultation, Lab Tests, X-ray, and
                             Pharmacy dispensing.
                         </p>
@@ -122,212 +142,1630 @@
 
         <!-- SECTION 3: Quick info -->
         <section
-            class="bg-gradient-to-r from-blue-900 via-blue-800 to-sky-900 max-w-full mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            class="bg-gradient-to-r from-blue-400 via-blue-300 to-sky-200 max-w-full mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             <div
-                class="bg-blue-800/50 border border-blue-600/50 shadow-xl backdrop-blur-sm p-4 rounded-xl flex items-center space-x-4">
+                class="bg-blue-600/50 border border-blue-600/50 shadow-xl backdrop-blur-sm p-4 rounded-xl flex items-center space-x-4">
                 <div class="bg-blue-100 text-blue-700 p-4 rounded-full"><i class="fa-solid fa-clock text-2xl"></i>
                 </div>
                 <div>
                     <h4 class="font-bold text-white text-sm">Clinic Working Hours</h4>
                     <p class="text-xs text-slate-200">Mon - Fri: 8:00 AM - 4:00 PM</p>
-                    <p class="text-xs text-blue-200 font-semibold">24/7 Emergency Service</p>
+                    <p class="text-xs text-blue-100 font-semibold">24/7 Emergency Service</p>
                 </div>
             </div>
             <div
-                class="bg-blue-800/50 border border-blue-600/50 shadow-xl backdrop-blur-sm p-4 rounded-xl flex items-center space-x-4">
+                class="bg-blue-600/50 border border-blue-600/50 shadow-xl backdrop-blur-sm p-4 rounded-xl flex items-center space-x-4">
                 <div class="bg-amber-100 text-blue-700 p-4 rounded-full"><i
                         class="fa-solid fa-phone-volume text-2xl"></i></div>
                 <div>
                     <h4 class="font-bold text-white text-sm">Emergency Hotlines</h4>
                     <p class="text-xs text-slate-200">Ambulance: +234 800 BUK CLINIC</p>
-                    <p class="text-xs text-blue-200 font-semibold">Reception Desk: Ext 104</p>
+                    <p class="text-xs text-blue-100 font-semibold">Reception Desk: Ext 104</p>
                 </div>
             </div>
             <div
-                class="bg-blue-800/50 border border-blue-600/50 shadow-xl backdrop-blur-sm p-4 rounded-xl flex items-center space-x-4">
+                class="bg-blue-600/50 border border-blue-600/50 shadow-xl backdrop-blur-sm p-4 rounded-xl flex items-center space-x-4">
                 <div class="bg-blue-100 text-blue-700 p-4 rounded-full"><i
                         class="fa-solid fa-location-dot text-2xl"></i></div>
                 <div>
                     <h4 class="font-bold text-white text-sm">Clinic Location</h4>
                     <p class="text-xs text-slate-200">BUK New Campus, Kano State</p>
-                    <p class="text-xs text-blue-200 font-semibold">Adjacent Ibrahim Gambari Square</p>
+                    <p class="text-xs text-blue-100 font-semibold">Adjacent Ibrahim Gambari Square</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- 2. STAFF LOGIN SECTION  -->
-    <section id="login-section"
-        class="bg-gradient-to-r from-blue-900 via-blue-800 to-sky-900 hidden min-h-[80vh] flex items-center justify-center p-4">
-        <div class="bg-blue-800 border border-blue-600/50 w-full max-w-md rounded-xl p-6 md:p-8 shadow-2xl">
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-white mb-1">Staff sign in</h2>
-                <p class="text-xs text-slate-200">BUK Health Centre, New Campus</p>
-            </div>
-            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-1.5">Email</label>
-                    <input type="email" id="email" required placeholder="aisha@buk.edu.ng"
-                        class="w-full bg-[#0a1730] border border-[#1e3a66] text-sm text-white px-3 py-2 rounded-lg outline-none focus:border-[#38bdf8] transition">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-1.5">Password</label>
-                    <input type="password" id="password" required
-                        class="w-full bg-[#0a1730] border border-[#1e3a66] text-sm text-white px-3 py-2 rounded-lg outline-none focus:border-[#38bdf8] transition">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-1.5">Sign in as</label>
-                    <select id="role"
-                        class="w-full bg-[#0a1730] border border-[#1e3a66] text-sm text-white px-3 py-2 rounded-lg outline-none focus:border-[#38bdf8] transition">
-                        <option value="Records Officer">Records Office</option>
-                        <option value="Triage Nurse">Nurse Triage</option>
-                        <option value="Doctor">Doctor</option>
-                        <option value="Diagnostics">Diagnostics</option>
-                        <option value="Pharmacist">Pharmacist</option>
 
-                    </select>
-                </div>
-                <div class="pt-2">
-                    <button type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Sign
-                        in</button>
-                </div>
-                <div>
-                    <button type="button" onclick="showSection('view-home')"
-                        class="w-full bg-transparent border border-[#1e3a66] hover:bg-[#1e3a66]/40 text-gray-200 font-medium py-2 rounded-lg text-sm transition">Back
-                        to home</button>
-                </div>
-            </form>
-            <p class="text-[11px] text-gray-400 mt-6 leading-relaxed">Restricted to BUK Health Centre medical and
-                administrative personnel. Demo sign-in: any email/password works. Real accounts come with Supabase Auth
-                later.</p>
+
+    
+<!-- STAFF LOGIN SECTION -->
+<section id="login-section"
+    class="bg-gradient-to-br from-blue-400 via-blue-350 to-sky-300 hidden min-h-[80vh] flex items-center justify-center p-4">
+
+    <div class="bg-white w-full max-w-md md:max-w-xl rounded-2xl p-6 md:p-8 shadow-2xl">
+
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-100 text-blue-600 mb-3">
+                <i class="fa-solid fa-notes-medical text-3xl"></i>
+            </div>
+
+            <h2 class="text-2xl font-bold text-slate-800">
+                Staff Login
+            </h2>
+
+            <p class="text-sm text-slate-500 mt-2">
+                BUK Health Centre, New Campus
+            </p>
         </div>
-    </section>
+
+        <!-- Login Form -->
+        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-5">
+
+            <div>
+                <label for="email"
+                    class="block text-sm font-medium text-slate-700 mb-1.5">
+                    Email Address
+                </label>
+
+                <div class="relative">
+                    <i class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+
+                    <input type="email" id="email" required
+                        placeholder="Enter your staff email"
+                        class="w-full bg-slate-50 border border-slate-300 text-sm text-slate-800 pl-10 pr-3 py-3 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                </div>
+            </div>
+
+            
+            <div>
+                <label for="password" class="block text-sm font-semibold text-slate-700 mb-2">
+                    Password
+                </label>
+
+                <div class="relative">
+                    <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+
+                    <input
+                        type="password"
+                        id="password"
+                        required
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        class="w-full border border-slate-300 rounded-lg py-3 pl-10 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+
+                    <button
+                        type="button"
+                        onclick="togglePassword('password', this)"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-700"
+                        aria-label="Show password"
+                        title="Show password"
+                    >
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <button type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-md">
+                <i class="fa-solid fa-right-to-bracket mr-2"></i>
+                Sign in
+            </button>
+
+            <button type="button" onclick="showSection('view-home')"
+                class="w-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-600 font-medium py-2.5 rounded-xl text-sm transition">
+                <i class="fa-solid fa-arrow-left mr-2"></i>
+                Back to Home
+            </button>
+
+        </form>
+
+        <!-- Registration Link -->
+        <div class="border-t border-slate-200 mt-6 pt-5 text-center">
+            <p class="text-sm text-slate-600">
+                Don't have an account?
+                <button type="button"
+                    onclick="showSection('register-section')"
+                    class="text-blue-700 hover:text-blue-900 font-semibold">
+                    Register here
+                </button>
+            </p>
+        </div>
+
+        <p class="text-xs text-slate-400 text-center mt-5 leading-relaxed">
+            Restricted to authorized BUK Health Centre personnel.
+        </p>
+
+    </div>
+</section>
+
+
+
+<!-- Staff Registration Section -->
+<section id="register-section"
+    class="bg-gradient-to-br from-blue-400 via-blue-350 to-sky-300 hidden min-h-[80vh] flex items-center justify-center p-4">
+
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl">
+
+        <!-- Registration Heading -->
+        <div class="text-center mb-7">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-100 text-blue-700 mb-4">
+                <i class="fa-solid fa-user-plus text-3xl"></i>
+            </div>
+
+            <h2 class="text-2xl font-bold text-slate-800">
+                Staff Registration
+            </h2>
+
+            <p class="text-sm text-slate-500 mt-2">
+                BUK Health Centre, New Campus
+            </p>
+        </div>
+
+        <!-- Registration Form -->
+        <form id="form-register"
+            onsubmit="handleRegister(event)"
+            class="space-y-4">
+
+            <!-- Full Name -->
+            <div>
+                <label for="staff-name"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Full Name
+                </label>
+
+                <input type="text"
+                    id="staff-name"
+                    name="fullName"
+                    required
+                    placeholder="Enter your full name"
+                    autocomplete="name"
+                    class="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Staff ID -->
+            <div>
+                <label for="staff-id"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Staff ID
+                </label>
+
+                <input type="text"
+                    id="staff-id"
+                    name="staffId"
+                    required
+                    placeholder="Enter your official Staff ID"
+                    class="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Email Address -->
+            <div>
+                <label for="register-email"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Email Address
+                </label>
+
+                <input type="email"
+                    id="register-email"
+                    name="email"
+                    required
+                    placeholder="Enter your email address"
+                    autocomplete="email"
+                    class="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Password -->
+          
+            <div>
+                <label for="register-password" class="block text-sm font-semibold text-slate-700 mb-2">
+                    Password
+                </label>
+
+                <div class="relative">
+                    <input
+                        type="password"
+                        id="register-password"
+                        name="password"
+                        required
+                        minlength="8"
+                        placeholder="Create a password (at least 8 characters)"
+                        autocomplete="new-password"
+                        class="w-full border border-slate-300 rounded-lg py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+
+                    <button
+                        type="button"
+                        onclick="togglePassword('register-password', this)"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-700"
+                        aria-label="Show password"
+                        title="Show password"
+                    >
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Confirm Password -->
+                    
+            <div>
+                <label for="register-password" class="block text-sm font-semibold text-slate-700 mb-2">
+                    Password
+                </label>
+
+                <div class="relative">
+                    <input
+                        type="password"
+                        id="confirm-password"
+                        name="password"
+                        required
+                        minlength="8"
+                        placeholder="Create a password (at least 8 characters)"
+                        autocomplete="new-password"
+                        class="w-full border border-slate-300 rounded-lg py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+
+                    <button
+                        type="button"
+                        onclick="togglePassword('confirm-password', this)"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-700"
+                        aria-label="Show password"
+                        title="Show password"
+                    >
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Register Button -->
+            <button type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow">
+                <i class="fa-solid fa-user-plus mr-2"></i>
+                Create Account
+            </button>
+
+            <!-- Back to Login -->
+            <button type="button"
+                onclick="showSection('login-section')"
+                class="w-full border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold py-3 rounded-lg transition">
+                Already have an account? Staff Login
+            </button>
+
+            <!-- Back to Home -->
+            <button type="button"
+                onclick="showSection('view-home')"
+                class="w-full text-sm text-slate-500 hover:text-blue-700 py-2">
+                Back to Home
+            </button>
+
+        </form>
+
+        <p class="text-xs text-slate-400 text-center mt-5 leading-relaxed">
+            Registration is for authorized BUK Health Centre personnel.
+            Staff details must be verified before access is granted.
+        </p>
+
+    </div>
+</section>
+
+
+<!-- Student Login Section -->
+<section id="student-login-section"
+    class="bg-gradient-to-br from-blue-400 via-blue-350 to-sky-300 hidden min-h-[80vh] flex items-center justify-center p-4">
+
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl">
+
+        <div class="text-center mb-7">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-100 text-blue-700 mb-4">
+                <i class="fa-solid fa-user-graduate text-3xl"></i>
+            </div>
+
+            <h2 class="text-2xl font-bold text-slate-800">Student Login</h2>
+
+            <p class="text-sm text-slate-500 mt-2">
+                BUK Health Centre, New Campus
+            </p>
+        </div>
+
+        <form id="form-student-login"
+            onsubmit="handleStudentLogin(event)"
+            class="space-y-5">
+
+            <div>
+                <label for="student-login-email"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Email Address
+                </label>
+
+                <input type="email"
+                    id="student-login-email"
+                    required
+                    autocomplete="email"
+                    placeholder="Enter your registered email"
+                    class="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="student-login-password"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Password
+                </label>
+
+                <div class="relative">
+                    <input type="password"
+                        id="student-login-password"
+                        required
+                        autocomplete="current-password"
+                        placeholder="Enter your password"
+                        class="w-full border border-slate-300 rounded-lg py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <button type="button"
+                        onclick="togglePassword('student-login-password', this)"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-700"
+                        aria-label="Show password"
+                        title="Show password">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow">
+                <i class="fa-solid fa-right-to-bracket mr-2"></i>
+                Sign In
+            </button>
+
+            <button type="button"
+                onclick="showSection('view-home')"
+                class="w-full border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold py-3 rounded-lg transition">
+                Back to Home
+            </button>
+        </form>
+
+        <div class="border-t border-slate-200 mt-6 pt-5 text-center">
+            <p class="text-sm text-slate-600">
+                Don't have an account?
+                <button type="button"
+                    onclick="showSection('student-register-section')"
+                    class="text-blue-700 font-bold hover:underline">
+                    Register here
+                </button>
+            </p>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- Student Registration Section -->
+<section id="student-register-section"
+    class="bg-gradient-to-br from-blue-400 via-blue-350 to-sky-300 hidden min-h-[80vh] flex items-center justify-center p-4">
+
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl">
+
+        <!-- Heading -->
+        <div class="text-center mb-7">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-100 text-blue-700 mb-4">
+                <i class="fa-solid fa-user-plus text-3xl"></i>
+            </div>
+
+            <h2 class="text-2xl font-bold text-slate-800">
+                Student Registration
+            </h2>
+
+            <p class="text-sm text-slate-500 mt-2">
+                BUK Health Centre, New Campus
+            </p>
+        </div>
+
+        <!-- Registration Form -->
+        <form id="form-student-register"
+            onsubmit="handleStudentRegister(event)"
+            class="space-y-4">
+
+            <!-- Registration Number -->
+            <div>
+                <label for="student-reg-no"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Student Registration Number
+                </label>
+
+                <input type="text"
+                    id="student-reg-no"
+                    name="registrationNumber"
+                    required
+                    placeholder="Enter your BUK registration number"
+                    class="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Full Name -->
+            <div>
+                <label for="student-full-name"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Full Name
+                </label>
+
+                <input type="text"
+                    id="student-full-name"
+                    name="fullName"
+                    required
+                    autocomplete="name"
+                    placeholder="Enter your full name"
+                    class="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Faculty -->
+            <div>
+                <label for="student-faculty"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Faculty
+                </label>
+
+                <input type="text"
+                    id="student-faculty"
+                    name="faculty"
+                    required
+                    placeholder="Enter your faculty"
+                    class="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Department -->
+            <div>
+                <label for="student-department"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Department
+                </label>
+
+                <input type="text"
+                    id="student-department"
+                    name="department"
+                    required
+                    placeholder="Enter your department"
+                    class="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Level -->
+            <div>
+                <label for="student-level"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Current Level
+                </label>
+
+                <select id="student-level"
+                    name="level"
+                    required
+                    class="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <option value="">Select your level</option>
+                    <option value="100">100 Level</option>
+                    <option value="200">200 Level</option>
+                    <option value="300">300 Level</option>
+                    <option value="400">400 Level</option>
+                    <option value="500">500 Level</option>
+                    <option value="600">600 Level</option>
+                </select>
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label for="student-register-email"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Email Address
+                </label>
+
+                <input type="email"
+                    id="student-register-email"
+                    name="email"
+                    required
+                    autocomplete="email"
+                    placeholder="Enter your email address"
+                    class="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label for="student-register-password"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Password
+                </label>
+
+                <div class="relative">
+                    <input type="password"
+                        id="student-register-password"
+                        name="password"
+                        required
+                        minlength="8"
+                        autocomplete="new-password"
+                        placeholder="At least 8 characters"
+                        class="w-full border border-slate-300 rounded-lg py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <button type="button"
+                        onclick="togglePassword('student-register-password', this)"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-700"
+                        aria-label="Show password"
+                        title="Show password">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div>
+                <label for="student-confirm-password"
+                    class="block text-sm font-semibold text-slate-700 mb-2">
+                    Confirm Password
+                </label>
+
+                <div class="relative">
+                    <input type="password"
+                        id="student-confirm-password"
+                        name="confirmPassword"
+                        required
+                        minlength="8"
+                        autocomplete="new-password"
+                        placeholder="Re-enter your password"
+                        class="w-full border border-slate-300 rounded-lg py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <button type="button"
+                        onclick="togglePassword('student-confirm-password', this)"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-700"
+                        aria-label="Show password"
+                        title="Show password">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow">
+                <i class="fa-solid fa-user-plus mr-2"></i>
+                Create Student Account
+            </button>
+
+            <!-- Existing Account -->
+            <button type="button"
+                onclick="showSection('student-login-section')"
+                class="w-full border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold py-3 rounded-lg transition">
+                Already have an account? Student Login
+            </button>
+
+            <!-- Home -->
+            <button type="button"
+                onclick="showSection('view-home')"
+                class="w-full text-sm text-slate-500 hover:text-blue-700 py-2">
+                Back to Home
+            </button>
+
+        </form>
+
+        <p class="text-xs text-slate-400 text-center mt-5 leading-relaxed">
+            Student information will be reviewed by the Records Officer.
+        </p>
+
+    </div>
+</section>
+
+
+<!-- Student Dashboard -->
+<section id="student-dashboard-section" class="hidden min-h-screen bg-gray-100 py-10 px-4">
+  <div class="max-w-4xl mx-auto">
+
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <h2 class="text-2xl font-bold text-blue-700 mb-2">
+        Student Dashboard
+      </h2>
+
+      <p class="text-gray-600">
+        Welcome to the BUK-CMS Student Portal.
+      </p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <h3 class="text-lg font-semibold mb-4">
+        Student Information
+      </h3>
+
+      <p class="mb-2">
+        <strong>Full Name:</strong>
+        <span id="dashboard-student-name">-</span>
+      </p>
+
+      <p class="mb-2">
+        <strong>Registration Number:</strong>
+        <span id="dashboard-student-regno">-</span>
+      </p>
+
+      <p class="mb-2">
+        <strong>Faculty:</strong>
+        <span id="dashboard-student-faculty">-</span>
+      </p>
+
+      <p class="mb-2">
+        <strong>Department:</strong>
+        <span id="dashboard-student-department">-</span>
+      </p>
+
+      <p>
+        <strong>Level:</strong>
+        <span id="dashboard-student-level">-</span>
+      </p>
+    </div>
+
+<div class="bg-white rounded-xl shadow-md p-6 mb-6">
+  <h3 class="text-lg font-semibold mb-3">
+    Clinic Registration
+  </h3>
+
+  <!-- Registration Status -->
+  <p class="mb-4">
+    Status:
+    <span id="student-clinic-status"
+      class="font-semibold text-slate-500">
+      Not Registered
+    </span>
+  </p>
+
+  <!-- Clinic Number: shown after approval -->
+  <div id="student-clinic-number-box"
+    class="hidden mb-4 rounded-lg border border-green-200 bg-green-50 p-4">
+
+    <p class="text-sm font-medium text-green-800">
+      Your Clinic Number
+    </p>
+
+    <p id="student-clinic-number"
+      class="mt-1 text-xl font-bold text-green-700">
+      -
+    </p>
+  </div>
+
+  <!-- Rejection Reason: shown after rejection -->
+  <div id="student-clinic-rejection-box"
+    class="hidden mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+
+    <p class="text-sm font-semibold text-red-800">
+      Reason for Rejection
+    </p>
+
+    <p id="student-clinic-rejection-reason"
+      class="mt-1 text-sm text-red-700">
+      -
+    </p>
+
+    <p class="mt-2 text-xs text-red-600">
+      Please review the reason and submit a new registration request
+      after correcting the problem.
+    </p>
+  </div>
+
+  <!-- Registration Button -->
+  <button
+    id="student-clinic-register-button"
+    type="button"
+    onclick="startClinicRegistration()"
+    class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded-lg">
+    Complete Clinic Registration
+  </button>
+</div>
+
+
+    <button
+      type="button"
+      onclick="handleStudentLogout()"
+      class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-lg">
+      Logout
+    </button>
+
+  </div>
+</section>
+
+
+<!-- Digital Health Service Form -->
+<section id="clinic-registration-section" class="hidden min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
+
+  <div class="max-w-5xl mx-auto">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-200">
+          <i class="fa-solid fa-hospital-user text-2xl"></i>
+        </div>
+
+        <div>
+          <p class="text-sm font-semibold text-blue-600 uppercase tracking-wider">
+            BUK-CMS Student Portal
+          </p>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">
+            Clinic Registration
+          </h2>
+          <p class="text-sm text-slate-500 mt-1">
+            University Health Centre, Bayero University Kano
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onclick="showSection('student-dashboard-section')"
+        class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back to Dashboard
+      </button>
+
+    </div>
+
+    <!-- Progress Card -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 mb-6 shadow-sm">
+
+      <div class="flex items-center justify-between gap-4 mb-4">
+        <div>
+          <h3 class="font-bold text-slate-800">Health Service Form</h3>
+          <p class="text-sm text-slate-500 mt-1">
+            Complete your details carefully before submission.
+          </p>
+        </div>
+
+        <span class="text-xs sm:text-sm font-semibold text-blue-700 bg-blue-50 px-3 py-2 rounded-full">
+          Step 1 of 2
+        </span>
+      </div>
+
+      <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div class="w-1/2 h-full bg-blue-600 rounded-full"></div>
+      </div>
+
+      <div class="flex justify-between mt-3 text-xs sm:text-sm">
+        <span class="font-semibold text-blue-700">
+          <i class="fa-solid fa-user-pen mr-1"></i>
+          Health Service Form
+        </span>
+
+        <span class="text-slate-400">
+          <i class="fa-solid fa-file-arrow-up mr-1"></i>
+          Documents
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Form -->
+    <form id="form-clinic-registration" onsubmit="submitClinicRegistration(event)">
+
+     
+
+<!-- Student Information -->
+<div class="bg-white border border-slate-200 rounded-2xl shadow-sm mb-6 overflow-hidden">
+
+  <div class="px-5 sm:px-7 py-5 border-b border-slate-100 flex items-center gap-3">
+    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+      <i class="fa-solid fa-graduation-cap text-lg"></i>
+    </div>
+
+    <div>
+      <h3 class="font-bold text-slate-800">Student Information</h3>
+      <p class="text-sm text-slate-500">Retrieved from your student account</p>
+    </div>
+
+    <span class="ml-auto text-xs font-semibold text-green-700 bg-green-50 px-3 py-2 rounded-full">
+      <i class="fa-solid fa-circle-check mr-1"></i>
+      Verified
+    </span>
+  </div>
+
+  <div class="p-5 sm:p-7 grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+    <div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+      <p class="text-xs text-slate-500 mb-1">Full Name</p>
+      <p id="clinic-display-name" class="font-semibold text-slate-800">-</p>
+    </div>
+
+    <div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+      <p class="text-xs text-slate-500 mb-1">Registration Number</p>
+      <p id="clinic-display-regno" class="font-semibold text-slate-800">-</p>
+    </div>
+
+    <div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+      <p class="text-xs text-slate-500 mb-1">Faculty</p>
+      <p id="clinic-display-faculty" class="font-semibold text-slate-800">-</p>
+    </div>
+
+    <div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+      <p class="text-xs text-slate-500 mb-1">Department</p>
+      <p id="clinic-display-department" class="font-semibold text-slate-800">-</p>
+    </div>
+
+    <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 sm:col-span-2">
+      <p class="text-xs text-slate-500 mb-1">Level</p>
+      <p id="clinic-display-level" class="font-semibold text-slate-800">-</p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Personal and Contact Information -->
+<div class="bg-white border border-slate-200 rounded-2xl shadow-sm mb-6 overflow-hidden">
+
+  <div class="px-5 sm:px-7 py-5 border-b border-slate-100 flex items-center gap-3">
+
+    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
+      <i class="fa-solid fa-user-edit text-lg"></i>
+    </div>
+
+    <div>
+      <h3 class="font-bold text-slate-800">Personal & Contact Information</h3>
+      <p class="text-sm text-slate-500">Provide your additional personal details</p>
+    </div>
+
+  </div>
+
+  <div class="p-5 sm:p-7 grid grid-cols-1 md:grid-cols-2 gap-5">
+
+    <!-- Year of Graduation -->
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-2">
+        Year of Graduation
+      </label>
+
+      <input
+        type="number"
+        id="clinic-graduation-year"
+        min="2020"
+        max="2100"
+        required
+        placeholder="e.g. 2027"
+        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition">
+    </div>
+
+    <!-- Phone Number -->
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-2">
+        Phone Number
+      </label>
+
+      <input
+        type="tel"
+        id="clinic-phone"
+        required
+        placeholder="e.g. 08012345678"
+        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition">
+    </div>
+
+    <!-- Sex -->
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-2">
+        Sex
+      </label>
+
+      <select
+        id="clinic-sex"
+        required
+        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition">
+
+        <option value="">Select sex</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+
+      </select>
+    </div>
+
+    <!-- Date of Birth -->
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-2">
+        Date of Birth
+      </label>
+
+      <input
+        type="date"
+        id="clinic-dob"
+        required
+        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition">
+    </div>
+
+  </div>
+</div>
+
+      <!-- Next of Kin -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm mb-6 overflow-hidden">
+
+        <div class="px-5 sm:px-7 py-5 border-b border-slate-100 flex items-center gap-3">
+          <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
+            <i class="fa-solid fa-people-roof text-lg"></i>
+          </div>
+
+          <div>
+            <h3 class="font-bold text-slate-800">Next of Kin</h3>
+            <p class="text-sm text-slate-500">Contact details for emergencies</p>
+          </div>
+        </div>
+
+        <div class="p-5 sm:p-7 grid grid-cols-1 md:grid-cols-2 gap-5">
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Full Name
+            </label>
+            <input
+              type="text"
+              id="clinic-next-kin"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
+              placeholder="Enter next of kin's full name">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Relationship
+            </label>
+            <input
+              type="text"
+              id="clinic-kin-relationship"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
+              placeholder="e.g. Father, Mother, Guardian">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Next of Kin Phone Number
+            </label>
+            <input
+              type="tel"
+              id="clinic-kin-phone"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
+              placeholder="Enter phone number">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Place of Origin
+            </label>
+            <input
+              type="text"
+              id="clinic-origin"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
+              placeholder="Town and state">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Tribe
+            </label>
+            <input
+              type="text"
+              id="clinic-tribe"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
+              placeholder="Enter tribe">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Religion
+            </label>
+            <input
+              type="text"
+              id="clinic-religion"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
+              placeholder="Enter religion">
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Address of Next of Kin
+            </label>
+            <textarea
+              id="clinic-kin-address"
+              rows="3"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
+              placeholder="Enter next of kin's contact address"></textarea>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Occupation
+            </label>
+            <input
+              type="text"
+              id="clinic-occupation"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
+              placeholder="Enter occupation">
+          </div>
+
+        </div>
+      </div>
+
+      
+<!-- Required Documents -->
+<div class="bg-white border border-slate-200 rounded-2xl shadow-sm mb-6 overflow-hidden">
+
+  <div class="px-5 sm:px-7 py-5 border-b border-slate-100 flex items-center gap-3">
+    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
+      <i class="fa-solid fa-file-arrow-up text-lg"></i>
+    </div>
+
+    <div>
+      <h3 class="font-bold text-slate-800">Required Documents</h3>
+      <p class="text-sm text-slate-500">Upload the three required documents</p>
+    </div>
+  </div>
+
+  <div class="p-5 sm:p-7 space-y-5">
+
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-2">
+        Admission Letter
+      </label>
+      <input
+        type="file"
+        id="clinic-admission-letter"
+        accept=".pdf,.jpg,.jpeg,.png"
+        required
+        class="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm">
+      <p class="text-xs text-slate-500 mt-1">PDF or image file</p>
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-2">
+        Passport Photograph
+      </label>
+      <input
+        type="file"
+        id="clinic-passport"
+        accept=".jpg,.jpeg,.png"
+        required
+        class="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm">
+      <p class="text-xs text-slate-500 mt-1">JPG or PNG image</p>
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-2">
+        Medical Certificate
+      </label>
+      <input
+        type="file"
+        id="clinic-medical-certificate"
+        accept=".pdf,.jpg,.jpeg,.png"
+        required
+        class="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm">
+      <p class="text-xs text-slate-500 mt-1">PDF or image file</p>
+    </div>
+
+  </div>
+</div>
+
+
+      <!-- Student Declaration -->
+      <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5 sm:p-6 mb-6">
+        <div class="flex gap-3">
+          <i class="fa-solid fa-circle-info text-blue-600 text-xl mt-1"></i>
+
+          <div>
+            <h3 class="font-bold text-blue-900">Before You Submit</h3>
+            <p class="text-sm text-blue-800 mt-1 leading-6">
+              Please check that your information is correct. Your clinic
+              registration request will be reviewed by the Records Officer.
+            </p>
+          </div>
+        </div>
+
+        <label class="flex items-start gap-3 mt-5 cursor-pointer">
+          <input
+            type="checkbox"
+            id="clinic-declaration"
+            required
+            class="mt-1 w-4 h-4 accent-blue-600">
+
+          <span class="text-sm text-slate-700">
+            I confirm that the information I have provided is accurate
+            to the best of my knowledge.
+          </span>
+        </label>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 mb-8">
+
+        <button
+          type="button"
+          onclick="showSection('student-dashboard-section')"
+          class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 font-semibold text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-arrow-left"></i>
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-7 py-3 font-semibold text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition">
+          Submit Clinic Registration
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+</section>
+
+
+
 
     <!-- 3. DASHBOARDS — one panel per role, only the matching one is shown after login -->
     <section id="dashboard-section" class="hidden min-h-screen bg-slate-100">
 
-        <!--  RECORDS OFFICER PANEL -->
-        <div id="panel-records" class="hidden max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white border border-slate-200 shadow-xl rounded-xl p-6">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">Register / Find Patient</h3>
-                <p id="reg-message" class="text-xs mb-3"></p>
-                <div class="space-y-4">
+<!-- RECORDS OFFICER PANEL -->
+<div id="panel-records" class="hidden max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+
+    <!-- Page Heading -->
+    <div class="mb-7">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                <i class="fa-solid fa-clipboard-user text-xl"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800">Records Management</h2>
+                <p class="text-sm text-slate-500">Register patients and manage the clinic queue.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+
+        <!-- REGISTRATION CARD -->
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+
+            <!-- Card Header -->
+            <div class="bg-gradient-to-r from-blue-400 to-blue-500 px-6 py-5 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+                        <i class="fa-solid fa-user-plus text-lg"></i>
+                    </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Registration number</label>
-                        <div class="flex space-x-2">
-                            <input type="text" id="search-matric" placeholder="CST/23/SWE/01131"
-                                class="w-full bg-slate-50 border border-slate-300 text-sm px-3 py-2 rounded-lg outline-none focus:border-blue-600">
-                            <button onclick="lookupStudent()"
-                                class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Look
-                                up</button>
+                        <h3 class="font-bold text-lg">Register / Find Patient</h3>
+                        <p class="text-blue-100 text-xs mt-1">Verify student information and register for clinic services.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+
+                <p id="reg-message" class="text-xs mb-4"></p>
+
+                <div class="space-y-5">
+
+                    <!-- Student Lookup -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                            <i class="fa-solid fa-id-card text-blue-600 mr-1"></i>
+                            Registration Number
+                        </label>
+
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="search-matric"
+                                placeholder="e.g. CST/23/SWE/01131"
+                                class="flex-1 bg-slate-50 border border-slate-300 text-sm px-4 py-3 rounded-xl outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+
+                            <button type="button" onclick="lookupStudent()"
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition">
+                                <i class="fa-solid fa-magnifying-glass mr-1"></i>
+                                Look up
+                            </button>
+                        </div>
+
+                        <p class="text-xs text-slate-400 mt-2">
+                            Enter the student's approved matric number or clinic number.
+                        </p>
+                    </div>
+
+                    <div class="border-t border-slate-100"></div>
+
+                    <!-- Student Information -->
+                    <div>
+                        <h4 class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-3">
+                            Student Information
+                        </h4>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-2">Full Name</label>
+                                <input type="text" id="reg-fullname" disabled
+                                    placeholder="Student's full name"
+                                    class="w-full bg-slate-100 border border-slate-200 text-sm px-4 py-3 rounded-xl text-slate-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-2">Department</label>
+                                <input type="text" id="reg-department" disabled
+                                    placeholder="Student's department"
+                                    class="w-full bg-slate-100 border border-slate-200 text-sm px-4 py-3 rounded-xl text-slate-500">
+                            </div>
+
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-xs font-medium text-slate-700 mb-1">Full Name</label>
-                            <input type="text" id="reg-fullname" disabled placeholder="Look up a matric number first"
-                                class="w-full bg-slate-100 border border-slate-200 text-sm px-3 py-2 rounded-lg text-slate-500">
-                        </div>
-                        <div><label class="block text-xs font-medium text-slate-600 mb-1">Department</label>
-                            <input type="text" id="reg-department" disabled
-                                class="w-full bg-slate-100 border border-slate-200 text-sm px-3 py-2 rounded-lg text-slate-500">
+
+                    <!-- Patient Biodata -->
+                    <div class="border-t border-slate-100 pt-4">
+                        <h4 class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-3">
+                            Patient Biodata
+                        </h4>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-2">Phone Number</label>
+                                <input type="tel" id="reg-phone" placeholder="080XXXXXXXX"
+                                    class="w-full bg-white border border-slate-300 text-sm px-4 py-3 rounded-xl outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-2">Gender</label>
+                                <select id="reg-gender"
+                                    class="w-full bg-white border border-slate-300 text-sm px-4 py-3 rounded-xl outline-none focus:border-blue-600">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-2">Date of Birth</label>
+                                <input type="date" id="reg-dob"
+                                    class="w-full bg-white border border-slate-300 text-sm px-4 py-3 rounded-xl outline-none focus:border-blue-600">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-2">Year of Graduation</label>
+                                <input type="number" id="reg-grad-year" placeholder="e.g. 2027"
+                                    class="w-full bg-white border border-slate-300 text-sm px-4 py-3 rounded-xl outline-none focus:border-blue-600">
+                            </div>
+
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-xs font-medium text-slate-700 mb-1">Phone Number</label>
-                            <input type="tel" id="reg-phone" placeholder="080..."
-                                class="w-full bg-white border border-slate-300 text-sm px-3 py-2 rounded-lg focus:border-blue-600 outline-none">
-                        </div>
-                        <div><label class="block text-xs font-medium text-slate-700 mb-1">Gender</label>
-                            <select id="reg-gender"
-                                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
+
+                    <!-- Next of Kin -->
+                    <div class="border-t border-slate-100 pt-4">
+                        <h4 class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-3">
+                            Emergency Contact
+                        </h4>
+
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">
+                            Next of Kin Phone Number
+                        </label>
+
+                        <input type="tel" id="reg-kin" placeholder="080XXXXXXXX"
+                            class="w-full bg-white border border-slate-300 text-sm px-4 py-3 rounded-xl outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+
+                        <p class="text-xs text-slate-400 mt-2">
+                            Enter the phone number of the student's next of kin.
+                        </p>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-xs font-medium text-slate-700 mb-1">Date of Birth</label>
-                            <input type="date" id="reg-dob"
-                                class="w-full bg-white border border-slate-300 text-sm px-3 py-2 rounded-lg focus:border-blue-600 outline-none">
-                        </div>
-                        <div><label class="block text-xs font-medium text-slate-600 mb-1">Year of Graduation</label>
-                            <input type="number" id="reg-grad-year" placeholder="2027"
-                                class="w-full bg-white border border-slate-300 text-sm px-3 py-2 rounded-lg focus:border-blue-600 outline-none">
-                        </div>
-                    </div>
-                    <div><label class="block text-xs font-medium text-slate-700 mb-1">Next of Kin Phone</label>
-                        <input type="tel" id="reg-kin" placeholder="080..."
-                            class="w-full bg-white border border-slate-300 text-sm px-3 py-2 rounded-lg focus:border-blue-600 outline-none">
-                    </div>
-                    <div><label class="block text-xs font-medium text-slate-700 mb-1">Priority</label>
+
+                    <!-- Queue Priority -->
+                    <div class="border-t border-slate-100 pt-4">
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">
+                            Queue Priority
+                        </label>
+
                         <select id="reg-priority"
-                            class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                            class="w-full bg-white border border-slate-300 text-sm px-4 py-3 rounded-xl outline-none focus:border-blue-600">
                             <option value="Normal">Normal</option>
                             <option value="Emergency">Emergency</option>
                         </select>
                     </div>
 
-                    <!-- additional -->
-                    <!-- Upload Required Documents for New Student File -->
-                    <div class="border-t border-slate-200 pt-3 mt-3">
-                        <p class="text-xs font-semibold text-slate-700 mb-2">New Student Required Uploads</p>
-                        <div class="grid grid-cols-2 gap-3 mb-3">
-                            <div>
-                                <label class="block text-[11px] text-slate-500 mb-1">Passport Photo</label>
-                                <input type="file" id="reg-passport" accept="image/*"
-                                    class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] text-slate-500 mb-1">Admission Letter</label>
-                                <input type="file" id="reg-admission" accept=".pdf,image/*"
-                                    class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] text-slate-500 mb-1">Medical Certificate</label>
-                                <input type="file" id="reg-medical" accept=".pdf,image/*"
-                                    class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] text-slate-500 mb-1">Service Form</label>
-                                <input type="file" id="reg-service" accept=".pdf,image/*"
-                                    class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
-                            </div>
+                    <!-- Submit -->
+                    <div class="pt-2">
+                        <button type="button" onclick="completeRegistration()"
+                            class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-md hover:shadow-lg">
+                            <i class="fa-solid fa-user-plus mr-2"></i>
+                            Register Patient &amp; Send to Nurse Queue
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PATIENT QUEUE CARD -->
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+
+            <!-- Queue Header -->
+            <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-5 text-white">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                            <i class="fa-solid fa-users text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg">Patient Queue</h3>
+                            <p class="text-slate-300 text-xs mt-1">Patients waiting for nurse triage.</p>
                         </div>
                     </div>
 
-                    <div class="pt-3">
-                        <button type="button" onclick="completeRegistration()"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition shadow">
-                            <i class="fa-solid fa-user-plus mr-1.5"></i> Complete Registration &amp; Send to Nurse Queue
-                        </button>
-                    </div>
+                    <span class="text-xs font-semibold bg-white/10 px-3 py-2 rounded-full">
+                        <i class="fa-solid fa-clock mr-1"></i> Live Queue
+                    </span>
                 </div>
             </div>
 
-            <div class="bg-white border border-slate-200 shadow-xl rounded-xl p-6">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">Patient Queue (waiting for Nurse)</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="border-b border-slate-200 text-slate-500 text-xs">
-                                <th class="pb-2">#</th>
-                                <th class="pb-2">Clinic No.</th>
-                                <th class="pb-2">Name</th>
-                                <th class="pb-2">Sex</th>
-                                <th class="pb-2">Age</th>
-                                <th class="pb-2">Priority</th>
+            <!-- Queue Table -->
+            <div class="p-4 md:p-5">
+
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm">Waiting Patients</h4>
+                        <p class="text-xs text-slate-400 mt-1">Registration and triage list</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+
+                        <thead class="bg-slate-50">
+                            <tr class="text-slate-500 text-xs uppercase tracking-wide">
+                                <th class="px-4 py-4 font-bold">#</th>
+                                <th class="px-4 py-4 font-bold">Clinic No.</th>
+                                <th class="px-4 py-4 font-bold">Patient Name</th>
+                                <th class="px-4 py-4 font-bold">Sex</th>
+                                <th class="px-4 py-4 font-bold">Age</th>
+                                <th class="px-4 py-4 font-bold">Priority</th>
                             </tr>
                         </thead>
-                        <tbody id="queue-list">
+
+                        <tbody id="queue-list" class="divide-y divide-slate-100">
                             <tr>
-                                <td colspan="6" class="text-center text-slate-400 py-6 text-xs">No patients in the queue
-                                    yet.</td>
+                                <td colspan="6" class="text-center text-slate-400 py-10 text-sm">
+                                    <i class="fa-solid fa-users text-2xl block mb-2 text-slate-300"></i>
+                                    No patients in the queue yet.
+                                </td>
                             </tr>
                         </tbody>
+
                     </table>
                 </div>
+
+                <div class="mt-4 flex items-center gap-2 text-xs text-slate-400">
+                    <i class="fa-solid fa-circle-info text-blue-500"></i>
+                    Queue information updates when patient registration is completed.
+                </div>
+
             </div>
+        </div>
+
+    </div>
+</div>
+
+
+              
+<!-- CLINIC REGISTRATION REQUESTS -->
+<div class="lg:col-span-2 bg-white border border-slate-200 shadow-xl rounded-2xl p-6">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div>
+      <h3 class="text-xl font-bold text-slate-800">
+        <i class="fa-solid fa-clipboard-check text-blue-600 mr-2"></i>
+        Clinic Registration Requests
+      </h3>
+      <p class="text-sm text-slate-500 mt-1">
+        Review and manage student clinic registration applications.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      onclick="renderClinicRequests()"
+      class="inline-flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition">
+      <i class="fa-solid fa-rotate"></i>
+      Refresh Requests
+    </button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+      <p class="text-xs text-slate-500 font-medium">Total Requests</p>
+      <h4 id="clinic-total-requests" class="text-2xl font-bold text-slate-800 mt-2">0</h4>
+    </div>
+
+    <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+      <p class="text-xs text-amber-700 font-medium">Pending</p>
+      <h4 id="clinic-pending-requests" class="text-2xl font-bold text-amber-700 mt-2">0</h4>
+    </div>
+
+    <div class="bg-green-50 border border-green-100 rounded-xl p-4">
+      <p class="text-xs text-green-700 font-medium">Approved</p>
+      <h4 id="clinic-approved-requests" class="text-2xl font-bold text-green-700 mt-2">0</h4>
+    </div>
+
+    <div class="bg-red-50 border border-red-100 rounded-xl p-4">
+      <p class="text-xs text-red-700 font-medium">Rejected</p>
+      <h4 id="clinic-rejected-requests" class="text-2xl font-bold text-red-700 mt-2">0</h4>
+    </div>
+
+  </div>
+
+  <!-- Requests Table -->
+  <div class="border border-slate-200 rounded-xl overflow-hidden">
+
+    <div class="px-4 py-4 bg-slate-50 border-b border-slate-200">
+      <h4 class="font-bold text-slate-800">Student Applications</h4>
+      <p class="text-xs text-slate-500 mt-1">
+        Select a request to review the student's information.
+      </p>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+
+      <thead class="bg-slate-50">
+  <tr>
+    <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Student</th>
+    <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Registration No.</th>
+    <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Department</th>
+    <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Date Submitted</th>
+    <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Status</th>
+    <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Action</th>
+  </tr>
+</thead>
+
+        <tbody id="clinic-requests-list">
+          <tr>
+            <td colspan="6" class="text-center text-slate-400 py-10">
+              No clinic registration requests available.
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+
+  <!-- Request Details -->
+  <div id="clinic-request-details"
+    class="hidden mt-6 border border-slate-200 rounded-2xl overflow-hidden">
+
+    <div class="bg-blue-50 border-b border-blue-100 px-5 py-4 flex items-center justify-between">
+      <div>
+        <h4 class="font-bold text-blue-900">Registration Application Details</h4>
+        <p class="text-xs text-blue-700 mt-1">
+          Review the submitted information before making a decision.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onclick="closeClinicRequestDetails()"
+        class="text-slate-500 hover:text-red-600 text-xl"
+        aria-label="Close details">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="p-5 space-y-6">
+
+      <div>
+        <h5 class="font-bold text-slate-800 mb-3">Student Information</h5>
+        <div id="clinic-detail-student"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        </div>
+      </div>
+
+      <div class="border-t border-slate-100 pt-5">
+        <h5 class="font-bold text-slate-800 mb-3">Patient Biodata</h5>
+        <div id="clinic-detail-biodata"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        </div>
+      </div>
+
+      <div class="border-t border-slate-100 pt-5">
+        <h5 class="font-bold text-slate-800 mb-3">Next of Kin & Health Service Information</h5>
+        <div id="clinic-detail-kin"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        </div>
+      </div>
+
+      <div class="border-t border-slate-100 pt-5">
+        <h5 class="font-bold text-slate-800 mb-3">Uploaded Documents</h5>
+        <div id="clinic-detail-documents"
+          class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        </div>
+      </div>
+
+      <!-- Approval and Rejection Actions -->
+      <div id="clinic-review-actions"
+        class="border-t border-slate-200 pt-5">
+
+        <h5 class="font-bold text-slate-800 mb-3">Review Decision</h5>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+
+          <button
+            type="button"
+            id="clinic-approve-button"
+            onclick="approveClinicRequest()"
+            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-xl transition">
+            <i class="fa-solid fa-check mr-2"></i>
+            Approve Registration
+          </button>
+
+          <button
+            type="button"
+            id="clinic-show-reject-button"
+            onclick="showClinicRejectForm()"
+            class="flex-1 bg-red-50 hover:bg-red-100 text-red-700 font-semibold py-3 px-4 rounded-xl transition">
+            <i class="fa-solid fa-xmark mr-2"></i>
+            Reject Registration
+          </button>
+
+        </div>
+
+        <!-- Rejection Reason Form -->
+        <div id="clinic-rejection-form"
+          class="hidden mt-5 bg-red-50 border border-red-100 rounded-xl p-5">
+
+          <h5 class="font-bold text-red-800 mb-2">
+            Reason for Rejection
+          </h5>
+
+          <p class="text-sm text-red-700 mb-3">
+            Explain why this application cannot be approved. The student will be able to see this reason.
+          </p>
+
+          <textarea
+            id="clinic-rejection-reason"
+            rows="4"
+            maxlength="500"
+            placeholder="Enter the reason for rejecting this registration..."
+            class="w-full border border-red-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-red-300 bg-white"></textarea>
+
+          <div class="flex flex-col sm:flex-row justify-end gap-3 mt-3">
+
+            <button
+              type="button"
+              onclick="hideClinicRejectForm()"
+              class="px-5 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold">
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              onclick="rejectClinicRequest()"
+              class="px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">
+              Confirm Rejection
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Existing Decision Information -->
+      <div id="clinic-review-result" class="hidden border-t border-slate-200 pt-5">
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<!-- END CLINIC REGISTRATION REQUESTS -->
+
+
         </div>
 
         <!-- ============ NURSE PANEL ============ -->
@@ -492,6 +1930,109 @@
                 </div>
             </div>
 
+
+            <!-- Pharmacy Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+
+                <!-- Pending Items -->
+                <div class="bg-white border border-blue-100 rounded-xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">
+                                Pending Items
+                            </p>
+                            <h3 id="pharm-pending-count" class="text-3xl font-bold text-blue-700 mt-2">
+                                0
+                            </h3>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-700" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3">
+                        Items awaiting processing
+                    </p>
+                </div>
+
+                <!-- Dispensed Items -->
+                <div class="bg-white border border-green-100 rounded-xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">
+                                Dispensed Items
+                            </p>
+                            <h3 id="pharm-dispensed-count" class="text-3xl font-bold text-green-700 mt-2">
+                                0
+                            </h3>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-green-700" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3">
+                        Items successfully dispensed
+                    </p>
+                </div>
+
+                <!-- Low Stock -->
+                <div class="bg-white border border-amber-100 rounded-xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">
+                                Low Stock Items
+                            </p>
+                            <h3 id="pharm-low-stock-count" class="text-3xl font-bold text-amber-600 mt-2">
+                                0
+                            </h3>
+                        </div>
+                        <div class="bg-amber-50 p-3 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-amber-600" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 9v4m0 4h.01M10.3 3.9L1.8 18.2A2 2 0 003.5 21h17a2 2 0 001.7-2.8L13.7 3.9a2 2 0 00-3.4 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3">
+                        Medicines needing restock
+                    </p>
+                </div>
+
+                <!-- Medical Supplies -->
+                <div class="bg-white border border-purple-100 rounded-xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">
+                                Medical Supplies
+                            </p>
+                            <h3 id="pharm-supplies-count" class="text-3xl font-bold text-purple-700 mt-2">
+                                0
+                            </h3>
+                        </div>
+                        <div class="bg-purple-50 p-3 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-purple-700" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3">
+                        Types of supplies recorded
+                    </p>
+                </div>
+
+            </div>
+            <!-- End Pharmacy Summary Cards -->
+
+
             <!-- Pharmacy tabs -->
             <div class="flex flex-wrap gap-2 mb-5">
 
@@ -510,10 +2051,312 @@
                     Medical Supplies
                 </button>
 
+                <button id="tab-history" onclick="showPharmTab('history')"
+                    class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium">
+                    Restock History
+                </button>
+
             </div>
 
             <!-- Pharmacy information table -->
             <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-4 md:p-6 overflow-x-auto">
+
+                
+        <!-- Inventory Actions -->
+        <div id="pharm-inventory-actions" class="hidden flex justify-end mb-4">
+
+            <button type="button" onclick="openRestockForm()"
+                class="bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                + Add Stock
+            </button>
+
+            <button type="button" onclick="openAddMedicineForm()"
+                class="bg-green-700 hover:bg-green-800 text-white text-sm font-medium ml-2 px-4 py-2 rounded-lg transition">
+                + Add New Medicine
+            </button>
+
+            <button type="button" onclick="openAddSupplyForm()"
+                class="bg-purple-700 hover:bg-purple-800 text-white text-sm font-medium ml-2 px-4 py-2 rounded-lg transition hidden">
+                + Add New Supply
+            </button>
+
+        </div>
+
+                <!-- Restock Form -->
+                <div id="restock-form-container" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-5 mb-5">
+
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-slate-800">
+                            Restock Inventory
+                        </h3>
+
+                        <button type="button" onclick="closeRestockForm()"
+                            class="text-slate-500 hover:text-red-600 text-xl font-bold" aria-label="Close restock form">
+                            &times;
+                        </button>
+                    </div>  
+
+                    <form id="restock-form" onsubmit="saveRestock(event)">
+
+                        <!-- Inventory Type -->
+                        <div class="mb-4">
+                            <label for="restock-type" class="block text-sm font-medium text-slate-700 mb-1">
+                                Inventory Type
+                            </label>
+
+                            <select id="restock-type" required onchange="updateRestockItems()"
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+
+                                <option value="Medicine">Medicine</option>
+                                <option value="Medical Supply">Medical Supply</option>
+                            </select>
+                        </div>
+
+                        <!-- Item Name -->
+                        <div class="mb-4">
+                            <label for="restock-item" class="block text-sm font-medium text-slate-700 mb-1">
+                                Item Name
+                            </label>
+
+                            <select id="restock-item" required
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+
+                                <option value="">Select an item</option>
+                            </select>
+                        </div>
+
+                        <!-- Store -->
+                        <div class="mb-4">
+                            <label for="restock-store" class="block text-sm font-medium text-slate-700 mb-1">
+                                Store Receiving Stock
+                            </label>
+
+                            <select id="restock-store" required
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+
+                                <option value="main">Main Store</option>
+                                <option value="active">Active Store</option>
+                                <option value="dispensary">Dispensary</option>
+                            </select>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="mb-5">
+                            <label for="restock-quantity" class="block text-sm font-medium text-slate-700 mb-1">
+                                Quantity Received
+                            </label>
+
+                            <input type="number" id="restock-quantity" min="1" step="1" required
+                                placeholder="Enter quantity received"
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="flex flex-wrap gap-3">
+                            <button type="submit"
+                                class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg text-sm font-medium">
+                                Save Stock
+                            </button>
+
+                            <button type="button" onclick="closeRestockForm()"
+                                class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-5 py-2 rounded-lg text-sm font-medium">
+                                Cancel
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+
+            
+
+                <!-- Add New Medicine Form -->
+                <div id="add-medicine-form-container"
+                    class="hidden bg-blue-50 border border-blue-200 rounded-xl p-5 mb-5">
+
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-slate-800">
+                            Add New Medicine
+                        </h3>
+
+                        <button type="button" onclick="closeAddMedicineForm()"
+                            class="text-slate-500 hover:text-red-600 text-xl font-bold">
+                            &times;
+                        </button>
+                    </div>
+
+                    <form id="add-medicine-form" onsubmit="saveNewMedicine(event)">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <div>
+                                <label for="new-medicine-name" class="block text-sm font-medium mb-1">
+                                    Medicine Name *
+                                </label>
+                                <input id="new-medicine-name" type="text" required placeholder="e.g. Ciprofloxacin"
+                                    class="w-full border rounded-lg px-3 py-2">
+                            </div>
+
+                            <div>
+                                <label for="new-medicine-strength" class="block text-sm font-medium mb-1">
+                                    Strength
+                                </label>
+                                <input id="new-medicine-strength" type="text" placeholder="e.g. 500 mg"
+                                    class="w-full border rounded-lg px-3 py-2">
+                            </div>
+
+                            <div>
+                                <label for="new-medicine-form" class="block text-sm font-medium mb-1">
+                                    Dosage Form
+                                </label>
+                                <select id="new-medicine-form" class="w-full border rounded-lg px-3 py-2 bg-white">
+                                    <option value="Tablet">Tablet</option>
+                                    <option value="Capsule">Capsule</option>
+                                    <option value="Syrup">Syrup</option>
+                                    <option value="Injection">Injection</option>
+                                    <option value="Inhaler">Inhaler</option>
+                                    <option value="Cream">Cream</option>
+                                    <option value="Drops">Drops</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="new-medicine-expiry" class="block text-sm font-medium mb-1">
+                                    Expiry Date
+                                </label>
+                                <input id="new-medicine-expiry" type="date" class="w-full border rounded-lg px-3 py-2">
+                            </div>
+
+                            <div>
+                                <label for="new-medicine-main" class="block text-sm font-medium mb-1">
+                                    Main Store Quantity
+                                </label>
+                                <input id="new-medicine-main" type="number" min="0" step="1" value="0" required
+                                    class="w-full border rounded-lg px-3 py-2">
+                            </div>
+
+                            <div>
+                                <label for="new-medicine-active" class="block text-sm font-medium mb-1">
+                                    Active Store Quantity
+                                </label>
+                                <input id="new-medicine-active" type="number" min="0" step="1" value="0" required
+                                    class="w-full border rounded-lg px-3 py-2">
+                            </div>
+
+                            <div>
+                                <label for="new-medicine-dispensary" class="block text-sm font-medium mb-1">
+                                    Dispensary Quantity
+                                </label>
+                                <input id="new-medicine-dispensary" type="number" min="0" step="1" value="0" required
+                                    class="w-full border rounded-lg px-3 py-2">
+                            </div>
+
+                        </div>
+
+                        <div class="flex gap-3 mt-5">
+                            <button type="submit"
+                                class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg text-sm">
+                                Save Medicine
+                            </button>
+
+                            <button type="button" onclick="closeAddMedicineForm()"
+                                class="bg-white border px-5 py-2 rounded-lg text-sm">
+                                Cancel
+                            </button>
+                        </div>
+                    </form> 
+                </div>
+
+                
+<!-- Add New Supply Form -->
+<div id="add-supply-form-container"
+    class="hidden bg-blue-50 border border-blue-200 rounded-xl p-5 mb-5">
+
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-slate-800">
+            Add New Medical Supply
+        </h3>
+
+        <button type="button" onclick="closeAddSupplyForm()"
+            class="text-slate-500 hover:text-red-600 text-xl font-bold"
+            aria-label="Close add supply form">
+            &times;
+        </button>
+    </div>
+
+    <form id="add-supply-form" onsubmit="saveNewSupply(event)">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div>
+                <label for="new-supply-name"
+                    class="block text-sm font-medium mb-1">
+                    Supply Name *
+                </label>
+                <input id="new-supply-name" type="text" required
+                    placeholder="e.g. Surgical Gloves"
+                    class="w-full border rounded-lg px-3 py-2">
+            </div>
+
+            <div>
+                <label for="new-supply-expiry"
+                    class="block text-sm font-medium mb-1">
+                    Expiry Date (if applicable)
+                </label>
+                <input id="new-supply-expiry" type="date"
+                    class="w-full border rounded-lg px-3 py-2">
+            </div>
+
+            <div>
+                <label for="new-supply-main"
+                    class="block text-sm font-medium mb-1">
+                    Main Store Quantity *
+                </label>
+                <input id="new-supply-main" type="number"
+                    min="0" step="1" value="0" required
+                    class="w-full border rounded-lg px-3 py-2">
+            </div>
+
+            <div>
+                <label for="new-supply-active"
+                    class="block text-sm font-medium mb-1">
+                    Active Store Quantity *
+                </label>
+                <input id="new-supply-active" type="number"
+                    min="0" step="1" value="0" required
+                    class="w-full border rounded-lg px-3 py-2">
+            </div>
+
+            <div>
+                <label for="new-supply-dispensary"
+                    class="block text-sm font-medium mb-1">
+                    Dispensary Quantity *
+                </label>
+                <input id="new-supply-dispensary" type="number"
+                    min="0" step="1" value="0" required
+                    class="w-full border rounded-lg px-3 py-2">
+            </div>
+
+        </div>
+
+        <div class="flex gap-3 mt-5">
+            <button type="submit"
+                class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg text-sm">
+                Save Supply
+            </button>
+
+            <button type="button" onclick="closeAddSupplyForm()"
+                class="bg-white border px-5 py-2 rounded-lg text-sm">
+                Cancel
+            </button>
+        </div>
+
+    </form>
+</div>
+
+
+                
+                    
 
                 <div class="mb-4">
                     <h3 id="pharm-table-title" class="text-lg font-semibold text-slate-800">
@@ -523,6 +2366,38 @@
                     <p id="pharm-table-description" class="text-sm text-slate-500 mt-1">
                         Review prescribed items and update their processing status.
                     </p>
+
+
+                    <!-- Search and Filter -->
+                    <div id="pharm-search-controls" class="flex flex-col md:flex-row gap-3 mt-4">
+
+                        <div class="flex-1">
+                            <label for="pharm-search" class="block text-xs font-medium text-slate-600 mb-1">
+                                Search prescriptions
+                            </label>
+
+                            <input type="search" id="pharm-search" placeholder="Search patient or medicine..."
+                                oninput="renderPharmacy()"
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        </div>
+
+                        <div id="pharm-status-container" class="w-full md:w-56">
+                            <label for="pharm-status-filter" class="block text-xs font-medium text-slate-600 mb-1">
+                                Filter by status
+                            </label>
+
+                            <select id="pharm-status-filter" onchange="renderPharmacy()"
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+
+                                <option value="All">All statuses</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Dispensed">Dispensed</option>
+                                <option value="Unavailable">Unavailable</option>
+                            </select>
+                        </div>
+
+                    </div>
+
                 </div>
 
                 <table class="w-full text-left text-sm">
@@ -540,8 +2415,19 @@
 
     </section>
 
-    <script src="js/data.js"></script>
-    <script src="js/app.js"></script>
+
+<script src="js/data.js"></script>
+<script src="js/modules/navigation.js"></script>
+<script src="js/modules/auth.js"></script>
+<script src="js/modules/records.js"></script>
+<script src="js/modules/nurse.js"></script>
+<script src="js/modules/doctor.js"></script>
+<script src="js/modules/diagnostics.js"></script>
+<script src="js/modules/pharmacy.js"></script>
+<script src="js/modules/reports.js"></script>
+<script src="js/modules/student.js"></script>
+<script src="js/app.js"></script>
+
 </body>
 
 </html>

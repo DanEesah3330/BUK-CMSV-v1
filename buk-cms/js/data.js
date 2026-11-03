@@ -76,7 +76,7 @@ const DEFAULT_SUPPLIES = [
     name: "IV Cannula",
     main: 60,
     active: 20,
-    dispensary: 10
+    dispensary: 9
   }
 ];
 
@@ -88,6 +88,12 @@ function loadDB() {
   if (raw) {
     const db = JSON.parse(raw);
 
+        // Add restock history to older demo databases if missing.
+    if (!Array.isArray(db.restockHistory)) {
+      db.restockHistory = [];
+      saveDB(db);
+    }
+
     // Add supplies to older demo databases if missing.
     if (!Array.isArray(db.supplies)) {
       db.supplies = DEFAULT_SUPPLIES.map((item) => ({ ...item }));
@@ -97,11 +103,12 @@ function loadDB() {
     return db;
   }
 
-  const fresh = {
+     const fresh = {
     patients: [],
     visits: [],
     drugs: DEFAULT_DRUGS.map((item) => ({ ...item })),
-    supplies: DEFAULT_SUPPLIES.map((item) => ({ ...item }))
+    supplies: DEFAULT_SUPPLIES.map((item) => ({ ...item })),
+    restockHistory: []
   };
 
   localStorage.setItem(DB_KEY, JSON.stringify(fresh));
@@ -136,42 +143,100 @@ function calculateAge(dob) {
 }
 
 // One file per patient. A returning patient keeps the same clinic number.
+
+
 function registerPatient(student, extra) {
   const db = loadDB();
-  let patient = db.patients.find((p) => p.matric === student.matric);
+
+  // Check whether the patient already exists by matric number or clinic number.
+  let patient = db.patients.find(function (p) {
+    return (
+      p.matric.toLowerCase() === student.matric.toLowerCase() ||
+      (student.clinicNumber &&
+        p.clinicNumber === student.clinicNumber)
+    );
+  });
+
   if (!patient) {
+    // Use the approved clinic number if one exists.
     patient = {
-      clinicNumber: "BUK-" + String(db.patients.length + 1).padStart(4, "0"),
-      matric: student.matric, name: student.name, department: student.department, sex: student.sex,
-      allergy: "", ...extra,
+      clinicNumber: student.clinicNumber ||
+        "BUK-" + String(db.patients.length + 1).padStart(4, "0"),
+
+      matric: student.matric,
+      name: student.name,
+      department: student.department,
+      sex: student.sex,
+
+      allergy: "",
+      ...extra
     };
+
     db.patients.push(patient);
+
   } else {
-    Object.assign(patient, extra);
+    // Update existing patient information.
+    Object.assign(patient, {
+      name: student.name,
+      department: student.department,
+      sex: student.sex,
+      ...extra
+    });
+
+    // Use the approved clinic number if the patient has one.
+    if (student.clinicNumber) {
+      patient.clinicNumber = student.clinicNumber;
+    }
   }
+
   saveDB(db);
+
   return patient;
 }
 
+
 function addToQueue(patient, priority) {
-  const db = loadDB(); // Ko loadDB() dangane da wanda kake amfani da shi
-  db.visits.push({
-    id: Date.now() + "-" + Math.random().toString(16).slice(2),
-    clinicNumber: patient.clinicNumber, 
-    matric: patient.matric || "",
-    name: patient.name, 
-    sex: patient.sex || "", 
-    age: (patient.dob ? calculateAge(patient.dob) : "") || patient.age || "", 
-    priority: priority || "Normal",
-    status: "Waiting", 
-    time: Date.now(),
-    vitals: null, 
-    complaint: "", 
-    diagnosis: "", 
-    lab: null, 
-    rx: [],
+  const db = loadDB();
+
+  // Look for an existing active visit for this patient.
+  const existingVisit = db.visits.find(function (visit) {
+    return (
+      visit.matric === patient.matric &&
+      ["Waiting", "Triaged", "With Doctor", "Doctor Absent"].includes(visit.status)
+    );
   });
+
+  if (existingVisit) {
+    // Update the clinic number without creating another visit.
+    existingVisit.clinicNumber = patient.clinicNumber;
+
+    saveDB(db);
+    return existingVisit;
+  }
+
+  // Create a new visit only if there is no active visit.
+  const newVisit = {
+    id: Date.now() + "-" + Math.random().toString(16).slice(2),
+    clinicNumber: patient.clinicNumber,
+    matric: patient.matric || "",
+    name: patient.name,
+    sex: patient.sex || "",
+    age: (patient.dob ? calculateAge(patient.dob) : "") || patient.age || "",
+    priority: priority || "Normal",
+    status: "Waiting",
+    time: Date.now(),
+    vitals: null,
+    complaint: "",
+    diagnosis: "",
+    lab: null,
+    rx: [],
+  };
+
+  db.visits.push(newVisit);
+
   saveDB(db);
+
+  return newVisit;
 }
 
 // function addToQueue(patient, priority) {
@@ -208,7 +273,6 @@ function updatePatient(clinicNumber, changes) {
   Object.assign(db.patients.find((p) => p.clinicNumber === clinicNumber), changes);
   saveDB(db);
 }
-function getDrugs() { return loadDB().drugs; }
 
 function getDrugs() {
   const db = loadDB();
@@ -230,6 +294,35 @@ function updateDrugByName(name, changes) {
   saveDB(db);
 
   return true;
+}
+
+function deactivateDrug(name) {
+  const confirmed = confirm(
+    `Are you sure you want to deactivate ${name}? It will be hidden from Drug Stock, but its saved records will remain.`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  const success = updateDrugByName(name, {
+    isActive: false
+  });
+
+    console.log("Deactivated medicine:", name, success);
+  console.log("Updated medicine:", getDrugs().find(
+    (drug) => drug.name === name
+  ));
+
+  if (!success) {
+    alert("Medicine not found.");
+    return;
+  }
+
+  renderPharmacy();
+  updatePharmacySummary();
+
+  alert("Medicine deactivated successfully.");
 }
 
 function getSupplies() {
@@ -258,6 +351,33 @@ function updateSupplyByName(name, changes) {
 
   return true;
 }
+
+
+function deactivateSupply(name) {
+  const confirmed = confirm(
+    `Are you sure you want to deactivate ${name}? It will be hidden from Medical Supplies, but its saved records will remain.`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  const success = updateSupplyByName(name, {
+    isActive: false
+  });
+
+  if (!success) {
+    alert("Medical supply not found.");
+    return;
+  }
+
+  renderPharmacy();
+  updatePharmacySummary();
+
+  alert("Medical supply deactivated successfully.");
+}
+
+
 function dashboardCounts() {
   const db = loadDB();
   const c = (s) => db.visits.filter((v) => v.status === s).length;
