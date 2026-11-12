@@ -1,125 +1,147 @@
-// Login / logout
-// --------------
 
-function handleLogin(event) {
+ // Login / logout using Supabase Auth
+// ----------------------------------
+
+async function handleLogin(event) {
   event.preventDefault();
 
-  // Get the email and password entered by the user
+  // Get the email and password entered by the user.
   const email = document.getElementById("email").value.trim().toLowerCase();
   const password = document.getElementById("password").value;
 
-  // Demo accounts for testing each staff dashboard
-  const demoAccounts = {
-    "records@bukcms.demo": "Records Officer",
-    "nurse@bukcms.demo": "Triage Nurse",
-    "doctor@bukcms.demo": "Doctor",
-    "diagnostics@bukcms.demo": "Diagnostics",
-    "pharmacy@bukcms.demo": "Pharmacist"
-  };
-
-  // Check whether the email and password are correct
-  if (!demoAccounts[email] || password !== "demo123") {
-    alert("Invalid demo email or password. Please try again.");
+  if (!email || !password) {
+    alert("Please enter your email and password.");
     return;
   }
 
-  // Set the role associated with the demo email
-  const role = demoAccounts[email];
-  currentRole = role;
+  // Sign in with Supabase Authentication.
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
 
-  // Save the demo role so the dashboard can be restored after refresh
-  localStorage.setItem("bukcms_role", role);
+  if (error) {
+    alert("Login failed: " + error.message);
+    return;
+  }
 
-  // Display the staff role in the navbar
-  document.getElementById("current-role-title").innerText = role;
+  // Retrieve the user's role from their Supabase profile.
+  const { data: profile, error: profileError } = await supabaseClient
+    .from("profiles")
+    .select("role")
+    .eq("id", data.user.id)
+    .single();
 
-  const roleBadge = document.getElementById("role-badge");
-  roleBadge.classList.remove("hidden");
-  roleBadge.classList.add("flex");
+  if (profileError || !profile) {
+    await supabaseClient.auth.signOut();
+    alert("Your account profile was not found. Please contact the administrator.");
+    return;
+  }
 
-  // Change the Login button to Logout
-  const loginBtn = document.getElementById("btn-login-toggle");
-  loginBtn.innerHTML =
-    '<i class="fa-solid fa-right-from-bracket mr-1"></i> Logout';
+  // Students use the separate Student Portal.
+  if (profile.role === "student") {
+    await supabaseClient.auth.signOut();
+    alert("Please use the Student Portal to sign in.");
+    return;
+  }
 
-  loginBtn.className =
-    "bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 rounded font-semibold transition shadow";
+  // Check that the account has an accepted staff role.
+  if (!AUTH_ROLE_LABELS[profile.role]) {
+    await supabaseClient.auth.signOut();
+    alert("Your account does not have a valid staff role.");
+    return;
+  }
 
-  loginBtn.setAttribute("onclick", "handleLogout()");
-
-  // Show the dashboard and hide the login form
-  showSection("dashboard-section");
-
-  // Reset the login form
+  // Open the dashboard using the role from Supabase.
   document.getElementById("form-login").reset();
-
-  // Show the Reports navigation option
-  document.getElementById("nav-reports").classList.remove("hidden");
-
-  // Open the correct dashboard for this staff role
-  enterDashboard(role);
+  openStaffDashboard(profile.role);
 }
 
 
-function handleLogout() {
+// Sign out from Supabase.
+async function handleLogout() {
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    alert("Logout failed: " + error.message);
+    return;
+  }
+
   currentRole = null;
-  localStorage.removeItem('bukcms_role');
 
-  const roleBadge = document.getElementById('role-badge');
-  roleBadge.classList.remove('flex');
-  roleBadge.classList.add('hidden');
+  const clinicSearch = document.getElementById("search-matric");
 
-  const loginBtn = document.getElementById('btn-login-toggle');
-  loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-1"></i> Staff Login';
-  loginBtn.className = "bg-blue-500 hover:bg-blue-600 text-white text-xs px-4 py-2 rounded font-semibold transition shadow";
-  loginBtn.setAttribute('onclick', "showSection('login-section')");
-  document.getElementById('nav-reports').classList.add('hidden');
-
-  showSection('view-home');
-  document.getElementById('form-login').reset();
+if (clinicSearch) {
+    clinicSearch.value = "";
 }
 
+  // Hide role badge.
+  const roleBadge = document.getElementById("role-badge");
 
+  if (roleBadge) {
+    roleBadge.classList.remove("flex");
+    roleBadge.classList.add("hidden");
+  }
+
+  // Restore Staff Login button.
+  const loginBtn = document.getElementById("btn-login-toggle");
+
+  if (loginBtn) {
+    loginBtn.innerHTML =
+      '<i class="fa-solid fa-right-to-bracket mr-1"></i> Staff Login';
+
+    loginBtn.className =
+      "bg-blue-700 hover:bg-blue-800 text-white text-sm px-4 py-2.5 rounded-lg font-semibold transition shadow";
+
+    loginBtn.setAttribute("onclick", "showSection('login-section')");
+  }
+
+  // Restore Student Login button.
+  const studentLoginBtn = document.getElementById("btn-student-login");
+
+  if (studentLoginBtn) {
+    studentLoginBtn.classList.remove("hidden");
+  }
+
+  // Hide Reports.
+ const reportsNav =
+    document.getElementById("nav-reports");
+
+const reportsNavMobile =
+    document.getElementById("nav-reports-mobile");
+
+[reportsNav, reportsNavMobile].forEach(button => {
+
+    if (!button) return;
+
+    button.classList.add("hidden");
+
+    button.style.display = "none";
+
+});
+
+  // Clear login form.
+  const loginForm = document.getElementById("form-login");
+
+  if (loginForm) loginForm.reset();
+
+  showSection("view-home");
+}
+
+// Public staff registration is disabled.
+// Staff accounts must be created by an authorised administrator.
 function handleRegister(event) {
   event.preventDefault();
 
-  // Get the information entered in the registration form
-  const fullName = document.getElementById("staff-name").value.trim();
-  const staffId = document.getElementById("staff-id").value.trim();
-  const email = document.getElementById("register-email").value.trim().toLowerCase();
-  const password = document.getElementById("register-password").value;
-  const confirmPassword = document.getElementById("confirm-password").value;
-
-  // Check that the passwords match
-  if (password !== confirmPassword) {
-    alert("Passwords do not match. Please try again.");
-    return;
-  }
-
-  // Check that the password has at least 8 characters
-  if (password.length < 8) {
-    alert("Password must contain at least 8 characters.");
-    return;
-  }
-
-  // Stop registration if any required field is empty
-  if (!fullName || !staffId || !email || !password) {
-    alert("Please complete all required fields.");
-    return;
-  }
-
-  // Explain that real registration is not connected yet
   alert(
-    "Your form has been validated, but account registration is not active yet. Supabase Auth and staff verification must be connected first."
+    "Staff account registration is restricted. Please contact the system administrator to create your account."
   );
 
-  // Clear the form after validation
-  document.getElementById("form-register").reset();
-
-  // Return to the login page
   showSection("login-section");
 }
 
+
+// Show or hide password.
 function togglePassword(inputId, button) {
   const passwordInput = document.getElementById(inputId);
   const eyeIcon = button.querySelector("i");
@@ -136,5 +158,3 @@ function togglePassword(inputId, button) {
     button.title = "Show password";
   }
 }
-
-

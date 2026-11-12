@@ -5,28 +5,59 @@
 let pharmTab = "rx";
 
 function showPharmTab(tab) {
-  // Close open forms when changing pharmacy tabs.
-  closeRestockForm();
-  closeAddMedicineForm();
 
-  pharmTab = tab;
+    // Close forms when switching tabs.
+    closeRestockForm();
+    closeAddMedicineForm();
+    closeAddSupplyForm();
 
-  ["rx", "stock", "supplies", "history"].forEach((t) => {
-    const btn = document.getElementById("tab-" + t);
+    pharmTab = tab;
 
-    if (!btn) return;
+    const baseClasses =
+        "text-xs sm:text-sm px-3 sm:px-4 py-2.5 rounded-lg font-medium flex-1 sm:flex-none text-center whitespace-nowrap";
 
-    btn.className = t === tab
-      ? "bg-blue-700 text-white text-sm px-4 py-2 rounded-lg font-medium"
-      : "bg-white border border-slate-300 text-slate-700 text-sm px-4 py-2 rounded-lg font-medium";
-  });
+    ["rx", "stock", "supplies", "history"].forEach((t) => {
 
-  renderPharmacy();
+        const btn = document.getElementById("tab-" + t);
+
+        if (!btn) return;
+
+        if (t === tab) {
+            btn.className =
+                `${baseClasses} bg-blue-700 text-white`;
+        } else {
+            btn.className =
+                `${baseClasses} bg-white border border-slate-300 text-slate-700`;
+        }
+
+    });
+
+    renderPharmacy();
 }
 
 
-// correction
-// -----------------
+function calculatePatientAge(dateOfBirth) {
+    if (!dateOfBirth) return "-";
+
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (
+        monthDifference < 0 ||
+        (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+        age--;
+    }
+
+    return age;
+}
+
+
+
 // calculate how many calender days remain before expiry.
 function getExpiryInfo(expiryValue) {
   // Check whether an expiry date was privided.
@@ -70,67 +101,93 @@ function getExpiryInfo(expiryValue) {
 }
 
 
-function updatePharmacySummary() {
-  const visits = getVisitsByStatus("At pharmacy");
-  const allVisits = loadDB().visits;
+async function updatePharmacySummary() {
 
-  // Count prescription items waiting for processing.
+  // 1. Get visits currently waiting at Pharmacy.
+  const { data: visits, error: visitsError } = await supabaseClient
+    .from("visits")
+    .select("id")
+    .eq("status", "At pharmacy");
+
+  if (visitsError) {
+    console.error("Pharmacy visits error:", visitsError);
+    return;
+  }
+
+  const visitIds = (visits || []).map(visit => visit.id);
+
+  // 2. Count pending prescription items.
   let pendingCount = 0;
 
-  visits.forEach((visit) => {
-    const items = Array.isArray(visit.rx) ? visit.rx : [];
+  if (visitIds.length > 0) {
+    const { count, error } = await supabaseClient
+      .from("prescriptions")
+      .select("id", { count: "exact", head: true })
+      .in("visit_id", visitIds)
+      .eq("status", "Pending");
 
-    items.forEach((item) => {
-      if ((item.dispenseStatus || "Pending") === "Pending") {
-        pendingCount++;
-      }
-    });
-  });
+    if (error) {
+      console.error("Pending prescriptions error:", error);
+      return;
+    }
 
-  // Count all items successfully dispensed.
-  let dispensedCount = 0;
+    pendingCount = count || 0;
+  }
 
-  allVisits.forEach((visit) => {
-    const items = Array.isArray(visit.rx) ? visit.rx : [];
+  // 3. Count all dispensed prescription items.
+  const { count: dispensedCount, error: dispensedError } =
+    await supabaseClient
+      .from("prescriptions")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "Dispensed");
 
-    items.forEach((item) => {
-      if (item.dispenseStatus === "Dispensed") {
-        dispensedCount++;
-      }
-    });
-  });
+  if (dispensedError) {
+    console.error("Dispensed prescriptions error:", dispensedError);
+    return;
+  }
 
-  // Count medicines with low dispensary stock.
-  const drugs = getDrugs();
+  // 4. Count medicines with low dispensary stock.
+  const { count: lowStockCount, error: stockError } =
+    await supabaseClient
+      .from("medicines")
+      .select("id", { count: "exact", head: true })
+      .lt("dispensary", 10);
 
-  const lowStockCount = drugs.filter(
-    (drug) => Number(drug.dispensary) < 10
-  ).length;
+  if (stockError) {
+    console.error("Low stock error:", stockError);
+    return;
+  }
 
-  // Count the types of medical supplies recorded.
-  const supplies = getSupplies();
-  const suppliesCount = supplies.length;
+  // 5. Count medical supplies.
+  const { count: suppliesCount, error: suppliesError } =
+    await supabaseClient
+      .from("medical_supplies")
+      .select("id", { count: "exact", head: true });
 
-  // Display the calculated numbers in the cards.
+  if (suppliesError) {
+    console.error("Supplies count error:", suppliesError);
+    return;
+  }
+
+  // 6. Display summary cards.
   document.getElementById("pharm-pending-count").textContent =
     pendingCount;
 
   document.getElementById("pharm-dispensed-count").textContent =
-    dispensedCount;
+    dispensedCount || 0;
 
   document.getElementById("pharm-low-stock-count").textContent =
-    lowStockCount;
+    lowStockCount || 0;
 
   document.getElementById("pharm-supplies-count").textContent =
-    suppliesCount;
+    suppliesCount || 0;
 }
 
-
-      function renderPharmacy() {
+      async function renderPharmacy() {
         const head = document.getElementById("pharm-head");
         const body = document.getElementById("pharm-body");
 
-        updatePharmacySummary();
+        await updatePharmacySummary();
 
 
         const controls = document.getElementById("pharm-search-controls");
@@ -165,7 +222,7 @@ function updatePharmacySummary() {
 
 
         if (controls) {
-          controls.classList.toggle("hidden", pharmTab === "rx" ? false : false);
+    controls.classList.remove("hidden");
         }
 
         if (searchInput) {
@@ -189,464 +246,1160 @@ function updatePharmacySummary() {
 
         if (!head || !body) return;
 
-        // TAB 1: PRESCRIPTIONS
+        // TAB 1: PRESCRIPTIONS - SUPABASE
 
-        if (pharmTab === "rx") {
-          // Get all visits so we can see every prescription status.
-          const visits = loadDB().visits || [];
+if (pharmTab === "rx") {
 
-          const searchInput = document.getElementById("pharm-search");
-          const statusInput = document.getElementById("pharm-status-filter");
+    const searchTerm = (
+        document.getElementById("pharm-search")?.value || ""
+    ).trim().toLowerCase();
 
-          const searchTerm = searchInput
-            ? searchInput.value.trim().toLowerCase()
-            : "";
+    const selectedStatus =
+        document.getElementById("pharm-status-filter")?.value || "All";
 
-          const selectedStatus = statusInput
-            ? statusInput.value
-            : "All";
+    if (title) title.textContent = "Prescription Items";
 
-          if (title) title.textContent = "Prescription Items";
+    if (description) {
+        description.textContent =
+            "View and process prescriptions submitted by Doctors.";
+    }
 
-          if (description) {
-            description.textContent =
-              "Search prescriptions and filter items by processing status.";
-          }
-
-          // Show search and filter only on the Prescriptions tab.
-          const controls = document.getElementById("pharm-prescription-controls");
-          if (controls) controls.classList.remove("hidden");
-
-          head.innerHTML = `
-          <th class="py-3 pr-3">Patient</th>
-          <th class="py-3 pr-3">Item</th>
-          <th class="py-3 pr-3">Type</th>
-          <th class="py-3 pr-3">Dosage</th>
-          <th class="py-3 pr-3">Quantity</th>
-          <th class="py-3 pr-3">Status</th>
-          <th class="py-3">Action</th>
+        head.innerHTML = `
+            <th class="py-3 pr-3">Patient</th>
+            <th class="py-3 pr-3">Clinic Number</th>
+            <th class="py-3 pr-3">Sex</th>
+            <th class="py-3 pr-3">Age</th>
+            <th class="py-3 pr-3">Item</th>
+            <th class="py-3 pr-3">Type</th>
+            <th class="py-3 pr-3">Dosage</th>
+            <th class="py-3 pr-3">Frequency</th>
+            <th class="py-3 pr-3">Duration</th>
+            <th class="py-3 pr-3">Quantity</th>
+            <th class="py-3">Status</th>
+            <th class="py-3">Action</th>
         `;
 
-          const rows = [];
+    body.innerHTML = `
+        <tr>
+            <td colspan="12" class="text-center py-6">
+                Loading prescriptions...
+            </td>
+        </tr>
+    `;
 
-          visits.forEach((v) => {
-            const items = Array.isArray(v.rx) ? v.rx : [];
-
-            items.forEach((item, index) => {
-              const status = item.dispenseStatus || "Pending";
-
-              // Apply the selected status filter.
-              if (
-                selectedStatus !== "All" &&
-                status !== selectedStatus
-              ) {
-                return;
-              }
-
-              // Search by patient name or prescription item name.
-              const patientName = String(v.name || "").toLowerCase();
-              const itemName = String(item.drug || "").toLowerCase();
-
-              if (
-                searchTerm &&
-                !patientName.includes(searchTerm) &&
-                !itemName.includes(searchTerm)
-              ) {
-                return;
-              }
-
-              const statusStyle =
-                status === "Dispensed"
-                  ? "bg-green-100 text-green-700"
-                  : status === "Unavailable"
-                    ? "bg-red-100 text-red-700"
-                    : "bg-amber-100 text-amber-800";
-
-              const action =
-                status === "Pending"
-                  ? `
-                  <div class="flex flex-wrap gap-2">
-                    <button
-                      onclick="dispense('${v.id}', ${index})"
-                      class="bg-blue-700 hover:bg-blue-800 text-white text-xs px-3 py-2 rounded-lg">
-                      Dispense
-                    </button>
-
-                    <button
-                      onclick="markPrescriptionUnavailable('${v.id}', ${index})"
-                      class="bg-red-50 hover:bg-red-100 text-red-700 text-xs px-3 py-2 rounded-lg">
-                      Unavailable
-                    </button>
-                  </div>
-                `
-                  : `<span class="text-slate-400 text-xs">Processed</span>`;
-
-              rows.push(`
-              <tr class="border-b border-slate-100 hover:bg-slate-50">
-                <td class="py-3 pr-3 font-medium text-slate-800">
-                  ${v.name || "-"}
-                </td>
-                <td class="py-3 pr-3">${item.drug || "-"}</td>
-                <td class="py-3 pr-3">${item.type || "Medicine"}</td>
-                <td class="py-3 pr-3">${item.dose || "-"}</td>
-                <td class="py-3 pr-3">${item.quantity ?? 1}</td>
-                <td class="py-3 pr-3">
-                  <span class="${statusStyle} text-xs px-2 py-1 rounded-full">
-                    ${status}
-                  </span>
-                </td>
-                <td class="py-3">${action}</td>
-              </tr>
-            `);
-            });
-          });
-
-          body.innerHTML = rows.length
-            ? rows.join("")
-            : `<tr>
-              <td colspan="7" class="text-center text-slate-400 py-8">
-                No prescription items match your search or filter.
-              </td>
-            </tr>`;
-
-          return;
-        }
-
-        // TAB 2: DRUG STOCK
-        if (pharmTab === "stock") {
-          const searchTerm = (
-            document.getElementById("pharm-search")?.value || ""
-          ).trim().toLowerCase();
-
-                const drugs = getDrugs().filter((drug) =>
-          drug.isActive !== false &&
-          String(drug.name || "").toLowerCase().includes(searchTerm)
-        );
-
-          if (title) title.textContent = "Drug Inventory";
-          if (description) {
-            description.textContent =
-              "Monitor medicine quantities, expiry dates and stock alerts.";
-          }
-
-              head.innerHTML = `
-                <th class="py-3 pr-3">Drug</th>
-                <th class="py-3 pr-3">Main Store</th>
-                <th class="py-3 pr-3">Active Store</th>
-                <th class="py-3 pr-3">Dispensary</th>
-                <th class="py-3 pr-3">Expiry</th>
-                <th class="py-3 pr-3">Alerts</th>
-                <th class="py-3">Action</th>
-              `;
-
-          body.innerHTML = drugs.length
-            ? drugs.map((d) => {
-              const low = Number(d.dispensary) < 10;
-              const expiryInfo = getExpiryInfo(d.expiry);
-
-              return `
-                  <tr class="border-b border-slate-100 hover:bg-slate-50">
-                    <td class="py-3 pr-3 font-medium">${d.name}</td>
-                    <td class="py-3 pr-3">${d.main}</td>
-                    <td class="py-3 pr-3">${d.active}</td>
-                    <td class="py-3 pr-3">${d.dispensary}</td>
-                    <td class="py-3 pr-3">${d.expiry || "Not recorded"}</td>
-                    <td class="py-3">
-                      ${expiryInfo.expired
-                  ? '<span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full mr-1">Expired</span>'
-                  : ""}
-                      ${expiryInfo.expiringSoon
-                  ? '<span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full mr-1">Expiring soon</span>'
-                  : ""}
-                      ${expiryInfo.needsCheck
-                  ? '<span class="bg-slate-200 text-slate-700 text-xs px-2 py-1 rounded-full mr-1">Check expiry</span>'
-                  : ""}
-                      ${low
-                  ? '<span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">Low stock</span>'
-                  : ""}
-                    </td>
-                    <td class="py-3">
-                      <button
-                        type="button"
-                        onclick="deactivateDrug('${d.name.replace(/'/g, "\\'")}')"
-                        class="bg-red-50 hover:bg-red-100 text-red-700 text-xs px-3 py-2 rounded-lg">
-                        Deactivate
-                      </button>
-                    </td>
-                  </tr>
-                `;
-            }).join("")
-            : `<tr><td colspan="6" class="text-center py-8 text-slate-400">
-                No medicines in stock.
-              </td></tr>`;
-
-          return;
-        }
-
-        // TAB 3: MEDICAL SUPPLIES
-        if (pharmTab === "supplies") {
-          const searchTerm = (
-            document.getElementById("pharm-search")?.value || ""
-          ).trim().toLowerCase();
-
-          const supplies = getSupplies().filter((supply) =>
-            supply.isActive !== false &&
-            String(supply.name || "").toLowerCase().includes(searchTerm)
-          );
-
-          if (title) title.textContent = "Medical Supplies Inventory";
-          if (description) {
-            description.textContent =
-              "Monitor the quantities of syringes, gauze and other medical supplies.";
-          }
-
-       
-          head.innerHTML = `
-            <th class="py-3 pr-3">Supply</th>
-            <th class="py-3 pr-3">Main Store</th>
-            <th class="py-3 pr-3">Active Store</th>
-            <th class="py-3 pr-3">Dispensary</th>
-            <th class="py-3 pr-3">Alerts</th>
-            <th class="py-3">Action</th>
-          `;
-
-
-          body.innerHTML = supplies.length
-            ? supplies.map((s) => {
-              const low = Number(s.dispensary) < 10;
-
-              return `
-                  <tr class="border-b border-slate-100 hover:bg-slate-50">
-                    <td class="py-3 pr-3 font-medium">${s.name}</td>
-                    <td class="py-3 pr-3">${s.main}</td>
-                    <td class="py-3 pr-3">${s.active}</td>
-                    <td class="py-3 pr-3">${s.dispensary}</td>
-                    <td class="py-3">
-                      ${low
-                  ? '<span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">Low stock</span>'
-                  : '<span class="text-slate-400 text-xs">—</span>'}
-                    </td>
-                    
-                <td class="py-3">
-                  <button
-                    type="button"
-                    onclick="deactivateSupply('${s.name.replace(/'/g, "\\'")}')"
-                    class="bg-red-50 hover:bg-red-100 text-red-700 text-xs px-3 py-2 rounded-lg">
-                    Deactivate
-                  </button>
-                </td>
-
-                  </tr>
-                `;
-            }).join("")
-                : `<tr><td colspan="5" class="text-center py-8 text-slate-400">
-                No medical supplies recorded.
-              </td></tr>`;
-          return;
-        }
-
-        // TAB 4: RESTOCK HISTORY
-        if (pharmTab === "history") {
-          const searchTerm = (
-            document.getElementById("pharm-search")?.value || ""
-          ).trim().toLowerCase();
-
-          const db = loadDB();
-          const history = Array.isArray(db.restockHistory)
-            ? db.restockHistory
-            : [];
-
-          const filteredHistory = history
-            .filter((item) =>
-              String(item.itemName || "").toLowerCase().includes(searchTerm)
+    const { data, error } = await supabaseClient
+    .from("prescriptions")
+    .select(`
+        id,
+        visit_id,
+        item_type,
+        medicine_id,
+        supply_id,
+        dosage,
+        frequency,
+        duration,
+        quantity,
+        status,
+        visits!prescriptions_visit_id_fkey (
+            patients!visits_patient_id_fkey (
+                full_name,
+                clinic_number,
+                sex,
+                date_of_birth
             )
-            .slice()
-            .reverse();
+        ),
+        medicines (
+            name,
+            strength
+        ),
+        medical_supplies (
+            name
+        )
+    `)
+    .order("created_at", { ascending: false });
 
-          if (title) title.textContent = "Restock History";
+    console.log(
+    "PHARMACY PRESCRIPTION DATA:",
+    JSON.stringify(data?.[0], null, 2)
+);
+    if (error) {
+        console.error("Prescription loading error:", error);
 
-          if (description) {
-            description.textContent =
-              "Review previously recorded stock additions.";
-          }
-
-          if (searchInput) {
-            searchInput.placeholder = "Search item name...";
-          }
-
-          head.innerHTML = `
-            <th class="py-3 pr-3">Item Name</th>
-            <th class="py-3 pr-3">Type</th>
-            <th class="py-3 pr-3">Quantity Added</th>
-            <th class="py-3 pr-3">Store</th>
-            <th class="py-3">Date</th>
-          `;
-
-          body.innerHTML = filteredHistory.length
-            ? filteredHistory.map((item) => {
-                const date = item.date
-                  ? new Date(item.date).toLocaleString()
-                  : "Not recorded";
-
-                const storeName = {
-                  main: "Main Store",
-                  active: "Active Store",
-                  dispensary: "Dispensary"
-                }[item.store] || item.store || "-";
-
-                return `
-                  <tr class="border-b border-slate-100 hover:bg-slate-50">
-                    <td class="py-3 pr-3 font-medium">${item.itemName || "-"}</td>
-                    <td class="py-3 pr-3">${item.type || "-"}</td>
-                    <td class="py-3 pr-3">${item.quantity ?? 0}</td>
-                    <td class="py-3 pr-3">${storeName}</td>
-                    <td class="py-3">${date}</td>
-                  </tr>
-                `;
-              }).join("")
-            : `<tr>
-                <td colspan="5" class="text-center text-slate-400 py-8">
-                  No restock history found.
+        body.innerHTML = `
+            <tr>
+                <td colspan="12" class="text-center text-red-600 py-6">
+                    Unable to load prescriptions.
                 </td>
-              </tr>`;
-        }
-      }
-        
+            </tr>
+        `;
 
-
-
-function dispense(id, index) {
-  const v = getVisitById(id);
-
-  if (!v || !Array.isArray(v.rx) || !v.rx[index]) {
-    alert("Prescription item not found.");
-    return;
-  }
-
-  const item = v.rx[index];
-
-  if (item.dispenseStatus !== "Pending") {
-    alert("This item has already been processed.");
-    return;
-  }
-
-  const quantity = Number(item.quantity);
-
-  if (!Number.isInteger(quantity) || quantity < 1) {
-    alert("Invalid prescription quantity.");
-    return;
-  }
-
-  // Handle medicine items.
-  if (!item.type || item.type === "Medicine") {
-    const drug = getDrugs().find(
-      (d) => d.name.toLowerCase() === item.drug.toLowerCase()
-    );
-
-    if (!drug) {
-      alert("Medicine not found in drug stock: " + item.drug);
-      return;
+        return;
     }
 
-    const expiryInfo = getExpiryInfo(drug.expiry);
+    const rows = (data || []).filter((item) => {
 
-    if (expiryInfo.needsCheck) {
-      alert("Please check the expiry date for " + drug.name + ".");
-      return;
-    }
+        const patient = item.visits?.patients;
+        const itemName = item.item_type === "Medicine"
+            ? `${item.medicines?.name || ""} ${item.medicines?.strength || ""}`.trim()
+            : item.medical_supplies?.name || "";
 
-    if (expiryInfo.expired) {
-      alert(drug.name + " has expired. Do not dispense it.");
-      return;
-    }
+        const patientName = patient?.full_name || "";
+        const clinicNumber = patient?.clinic_number || "";
 
-    if (Number(drug.dispensary) < quantity) {
-      alert("Not enough " + drug.name + " in the dispensary.");
-      return;
-    }
+        const matchesSearch =
+            !searchTerm ||
+            patientName.toLowerCase().includes(searchTerm) ||
+            clinicNumber.toLowerCase().includes(searchTerm) ||
+            itemName.toLowerCase().includes(searchTerm);
 
-    updateDrugByName(drug.name, {
-      dispensary: Number(drug.dispensary) - quantity
+        const matchesStatus =
+            selectedStatus === "All" ||
+            item.status === selectedStatus;
+
+        return matchesSearch && matchesStatus;
     });
 
-    
-  }
+    body.innerHTML = rows.length
+        ? rows.map((item) => {
 
-  // Handle medical supply items.
-  else if (item.type === "Medical Supply") {
-    const supply = getSupplies().find(
-      (s) => s.name.toLowerCase() === item.drug.toLowerCase()
+            const actionButtons = item.status === "Pending"
+    ? `
+        <div class="flex flex-wrap gap-2">
+
+            <button
+                type="button"
+                onclick="dispensePrescription('${item.id}')"
+                class="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-2 rounded-lg">
+                Dispense
+            </button>
+
+            <button
+                type="button"
+                onclick="markPrescriptionUnavailable('${item.id}')"
+                class="bg-red-50 hover:bg-red-100 text-red-700 text-xs px-3 py-2 rounded-lg">
+                Unavailable
+            </button>
+
+        </div>
+    `
+    : '<span class="text-slate-400 text-xs">Processed</span>';
+
+            const patient = item.visits?.patients;
+
+            const itemName = item.item_type === "Medicine"
+                ? `${item.medicines?.name || ""} ${item.medicines?.strength || ""}`.trim()
+                : item.medical_supplies?.name || "";
+
+            const statusStyle =
+                item.status === "Dispensed"
+                    ? "bg-green-100 text-green-700"
+                    : item.status === "Unavailable"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-amber-100 text-amber-800";
+
+            return `
+                <tr class="border-b border-slate-100 hover:bg-slate-50">
+
+                    <td class="py-3 pr-3 font-medium">
+                    ${patient?.full_name || "-"}
+                </td>
+
+                <td class="py-3 pr-3">
+                    ${patient?.clinic_number || "-"}
+                </td>
+
+                <td class="py-3 pr-3">
+                    ${patient?.sex || "-"}
+                </td>
+
+                <td class="py-3 pr-3">
+                    ${calculatePatientAge(patient?.date_of_birth)}
+                </td>
+                    <td class="py-3 pr-3 font-medium">
+                        ${itemName || "-"}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${item.item_type}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${item.dosage || "-"}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${item.frequency || "-"}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${item.duration || "-"}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${item.quantity}
+                    </td>
+
+                    <td class="py-3">
+                        <span class="${statusStyle} text-xs px-2 py-1 rounded-full">
+                            ${item.status}
+                        </span>
+                    </td>
+
+                    <td class="py-3">
+                        ${actionButtons}
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("")
+        : `
+            <tr>
+                <td colspan="12"
+                    class="text-center text-slate-400 py-8">
+                    No prescription items found.
+                </td>
+            </tr>
+        `;
+
+    return;
+}
+        // TAB 2: DRUG STOCK - SUPABASE
+if (pharmTab === "stock") {
+
+    const searchTerm = (
+        document.getElementById("pharm-search")?.value || ""
+    ).trim().toLowerCase();
+
+    if (title) title.textContent = "Drug Inventory";
+
+    if (description) {
+        description.textContent =
+            "Monitor medicine quantities, expiry dates and stock alerts.";
+    }
+
+    head.innerHTML = `
+        <th class="py-3 pr-3">Drug</th>
+        <th class="py-3 pr-3">Main Store</th>
+        <th class="py-3 pr-3">Active Store</th>
+        <th class="py-3 pr-3">Dispensary</th>
+        <th class="py-3 pr-3">Expiry</th>
+        <th class="py-3 pr-3">Alerts</th>
+        <th class="py-3">Action</th>
+    `;
+
+    body.innerHTML = `
+        <tr>
+            <td colspan="7" class="text-center py-6">
+                Loading medicine inventory...
+            </td>
+        </tr>
+    `;
+
+    const { data, error } = await supabaseClient
+        .from("medicines")
+        .select(`
+            id,
+            name,
+            quantity,
+            reorder_level,
+            expiry_date,
+            main,
+            active,
+            dispensary,
+            is_active
+        `)
+        .eq("is_active", true)
+        .order("name");
+
+    if (error) {
+        console.error("Medicine inventory error:", error);
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center text-red-600 py-6">
+                    Unable to load medicine inventory.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    const drugs = (data || []).filter(drug =>
+        String(drug.name || "")
+            .toLowerCase()
+            .includes(searchTerm)
     );
 
-    if (!supply) {
-      alert("Medical supply not found: " + item.drug);
-      return;
-    }
+    body.innerHTML = drugs.length
+        ? drugs.map(drug => {
 
-    if (Number(supply.dispensary) < quantity) {
-      alert("Not enough " + supply.name + " in the dispensary.");
-      return;
-    }
+            const low =
+                Number(drug.dispensary || 0) < 10;
 
-    updateSupplyByName(supply.name, {
-      dispensary: Number(supply.dispensary) - quantity
-    });
-  }
+            const expiryInfo =
+                getExpiryInfo(drug.expiry_date);
 
-  else {
-    alert("Unknown prescription item type: " + item.type);
+            return `
+                <tr class="border-b border-slate-100 hover:bg-slate-50">
+
+                    <td class="py-3 pr-3 font-medium">
+                        ${drug.name}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${drug.main ?? 0}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${drug.active ?? 0}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${drug.dispensary ?? 0}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${drug.expiry_date || "Not recorded"}
+                    </td>
+
+                    <td class="py-3">
+
+                        ${expiryInfo.expired
+                            ? '<span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full mr-1">Expired</span>'
+                            : ""}
+
+                        ${expiryInfo.expiringSoon
+                            ? '<span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full mr-1">Expiring soon</span>'
+                            : ""}
+
+                        ${expiryInfo.needsCheck
+                            ? '<span class="bg-slate-200 text-slate-700 text-xs px-2 py-1 rounded-full mr-1">Check expiry</span>'
+                            : ""}
+
+                        ${low
+                            ? '<span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">Low stock</span>'
+                            : ""}
+
+                    </td>
+
+                    <td class="py-3">
+            <div class="flex flex-wrap gap-2 min-w-[150px]">
+
+                <button
+                    type="button"
+                    onclick="editMedicine('${drug.id}')"
+                    class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs px-3 py-2 rounded-lg whitespace-nowrap">
+                    Edit
+                </button>
+
+                <button
+                    type="button"
+                    onclick="deactivateDrug('${drug.id}')"
+                    class="bg-red-50 hover:bg-red-100 text-red-700 text-xs px-3 py-2 rounded-lg whitespace-nowrap">
+                    Deactivate
+                </button>
+
+            </div>
+        </td>
+
+                </tr>
+            `;
+
+        }).join("")
+        : `
+            <tr>
+                <td colspan="7"
+                    class="text-center py-8 text-slate-400">
+                    No medicines in stock.
+                </td>
+            </tr>
+        `;
+
     return;
-  }
-
-  // Mark only this item as dispensed.
-  const updatedItems = v.rx.map((rxItem, i) =>
-    i === index
-      ? { ...rxItem, dispenseStatus: "Dispensed" }
-      : rxItem
-  );
-
-  const remaining = updatedItems.some(
-    (rxItem) => rxItem.dispenseStatus === "Pending"
-  );
-
-  updateVisit(id, {
-    rx: updatedItems,
-    status: remaining ? "At pharmacy" : "Done"
-  });
-
-  renderPharmacy();
 }
 
 
-function markPrescriptionUnavailable(id, index) {
-  const v = getVisitById(id);
+        // TAB 3: MEDICAL SUPPLIES - SUPABASE
 
-  if (!v || !Array.isArray(v.rx) || !v.rx[index]) {
-    alert("Prescription item not found.");
+if (pharmTab === "supplies") {
+
+    const searchTerm = (
+        document.getElementById("pharm-search")?.value || ""
+    ).trim().toLowerCase();
+
+    if (title) title.textContent = "Medical Supplies Inventory";
+
+    if (description) {
+        description.textContent =
+            "Monitor the quantities of syringes, gauze and other medical supplies.";
+    }
+
+    head.innerHTML = `
+        <th class="py-3 pr-3">Supply</th>
+        <th class="py-3 pr-3">Main Store</th>
+        <th class="py-3 pr-3">Active Store</th>
+        <th class="py-3 pr-3">Dispensary</th>
+        <th class="py-3 pr-3">Alerts</th>
+        <th class="py-3">Action</th>
+    `;
+
+    body.innerHTML = `
+        <tr>
+            <td colspan="6" class="text-center py-6">
+                Loading medical supplies...
+            </td>
+        </tr>
+    `;
+
+    // Fetch supplies from Supabase.
+    const { data, error } = await supabaseClient
+        .from("medical_supplies")
+        .select(`
+            id,
+            name,
+            quantity,
+            reorder_level,
+            expiry_date,
+            main,
+            active,
+            dispensary,
+            is_active
+        `)
+        .eq("is_active", true)
+        .order("name");
+
+    if (error) {
+        console.error("Medical supplies loading error:", error);
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-red-600 py-6">
+                    Unable to load medical supplies.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+   
+
+    // Apply search filter.
+    const supplies = (data || []).filter(supply =>
+        String(supply.name || "")
+            .toLowerCase()
+            .includes(searchTerm)
+    );
+
+    // Display supplies.
+    body.innerHTML = supplies.length
+        ? supplies.map(supply => {
+
+            const low =
+                Number(supply.dispensary || 0) < 10;
+
+            return `
+                <tr class="border-b border-slate-100 hover:bg-slate-50">
+
+                    <td class="py-3 pr-3 font-medium">
+                        ${supply.name}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${supply.main ?? 0}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${supply.active ?? 0}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${supply.dispensary ?? 0}
+                    </td>
+
+                    <td class="py-3">
+                        ${low
+                            ? '<span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">Low stock</span>'
+                            : '<span class="text-slate-400 text-xs">—</span>'}
+                    </td>
+
+                   <td class="py-3">
+            <div class="flex flex-wrap gap-2 min-w-[150px]">
+                <button
+                    type="button"
+                    onclick="editSupply('${supply.id}')"
+                    class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs px-3 py-2 rounded-lg whitespace-nowrap">
+                    Edit
+                </button>
+
+                <button
+                    type="button"
+                    onclick="deactivateSupply('${supply.id}')"
+                    class="bg-red-50 hover:bg-red-100 text-red-700 text-xs px-3 py-2 rounded-lg whitespace-nowrap">
+                    Deactivate
+                </button>
+            </div>
+        </td>
+
+                </tr>
+            `;
+
+        }).join("")
+        : `
+            <tr>
+                <td colspan="6"
+                    class="text-center py-8 text-slate-400">
+                    No medical supplies recorded.
+                </td>
+            </tr>
+        `;
+
+      return;
+    }
+
+
+
+// ==========================================
+// TAB 4: INVENTORY HISTORY - SUPABASE
+// ==========================================
+
+if (pharmTab === "history") {
+
+    const searchTerm = (
+        document.getElementById("pharm-search")?.value || ""
+    ).trim().toLowerCase();
+
+    if (title) title.textContent = "Inventory History";
+
+    if (description) {
+        description.textContent =
+            "Track all stock received and issued by the Pharmacy.";
+    }
+
+    head.innerHTML = `
+        <th class="py-3 pr-3">Item</th>
+        <th class="py-3 pr-3">Type</th>
+        <th class="py-3 pr-3">Movement</th>
+        <th class="py-3 pr-3">Quantity</th>
+        <th class="py-3 pr-3">Details</th>
+        <th class="py-3 pr-3">Recorded By</th>
+        <th class="py-3">Date</th>
+    `;
+
+    body.innerHTML = `
+        <tr>
+            <td colspan="7" class="text-center py-6">
+                Loading inventory history...
+            </td>
+        </tr>
+    `;
+
+    // Fetch inventory movements.
+    const { data, error } = await supabaseClient
+        .from("inventory_movements")
+        .select(`
+            id,
+            item_type,
+            medicine_id,
+            supply_id,
+            movement_type,
+            quantity,
+            notes,
+            recorded_by,
+            created_at
+        `)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error("Inventory history error:", error);
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="7"
+                    class="text-center text-red-600 py-6">
+                    Unable to load inventory history.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+    
+
+    // Collect medicine and supply IDs.
+    const medicineIds = [
+        ...new Set(
+            (data || [])
+                .filter(item => item.medicine_id)
+                .map(item => item.medicine_id)
+        )
+    ];
+
+    const supplyIds = [
+        ...new Set(
+            (data || [])
+                .filter(item => item.supply_id)
+                .map(item => item.supply_id)
+        )
+    ];
+
+    // Load medicine names.
+    let medicineMap = {};
+
+    if (medicineIds.length) {
+
+        const { data: medicines, error: medicineError } =
+            await supabaseClient
+                .from("medicines")
+                .select("id, name, strength")
+                .in("id", medicineIds);
+
+        if (medicineError) {
+            console.error("Medicine history lookup error:", medicineError);
+        } else {
+            (medicines || []).forEach(medicine => {
+                medicineMap[medicine.id] =
+                    `${medicine.name} ${medicine.strength || ""}`.trim();
+            });
+        }
+    }
+
+    // Load medical supply names.
+    let supplyMap = {};
+
+    if (supplyIds.length) {
+
+        const { data: supplies, error: supplyError } =
+            await supabaseClient
+                .from("medical_supplies")
+                .select("id, name")
+                .in("id", supplyIds);
+
+        if (supplyError) {
+            console.error("Supply history lookup error:", supplyError);
+        } else {
+            (supplies || []).forEach(supply => {
+                supplyMap[supply.id] = supply.name;
+            });
+        }
+    }
+
+    // Apply search filter.
+    const movements = (data || []).filter(item => {
+
+        const itemName = item.item_type === "Medicine"
+            ? medicineMap[item.medicine_id] || "Medicine"
+            : supplyMap[item.supply_id] || "Medical Supply";
+
+        return (
+            itemName.toLowerCase().includes(searchTerm) ||
+            String(item.movement_type || "").toLowerCase().includes(searchTerm) ||
+            String(item.notes || "").toLowerCase().includes(searchTerm)
+        );
+    });
+
+    // Get staff names from profiles
+let staffMap = {};
+
+const recordedByIds = [
+    ...new Set(
+        (movements || [])
+            .filter(item => item.recorded_by)
+            .map(item => item.recorded_by)
+    )
+];
+
+if (recordedByIds.length) {
+    const { data: profiles, error: profilesError } = await supabaseClient
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", recordedByIds);
+
+    if (profilesError) {
+        console.error("Staff history lookup error:", profilesError);
+    } else {
+        (profiles || []).forEach(profile => {
+            staffMap[profile.id] = profile.full_name || "Staff";
+        });
+    }
+}
+
+    // Display inventory history.
+    body.innerHTML = movements.length
+        ? movements.map(item => {
+
+            const itemName = item.item_type === "Medicine"
+                ? medicineMap[item.medicine_id] || "Medicine"
+                : supplyMap[item.supply_id] || "Medical Supply";
+
+            const movementStyle =
+                item.movement_type === "Stock In"
+                    ? "bg-green-100 text-green-700"
+                    : item.movement_type === "Stock Out"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-blue-100 text-blue-700";
+
+            const date = item.created_at
+                ? new Date(item.created_at).toLocaleString()
+                : "-";
+
+            const staff = item.recorded_by
+            ? staffMap[item.recorded_by] || "Staff"
+            : "-";
+
+            return `
+                <tr class="border-b border-slate-100 hover:bg-slate-50">
+
+                    <td class="py-3 pr-3 font-medium">
+                        ${itemName}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${item.item_type}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        <span class="${movementStyle} text-xs px-2 py-1 rounded-full">
+                            ${item.movement_type}
+                        </span>
+                    </td>
+
+                    <td class="py-3 pr-3 font-semibold">
+                        ${item.quantity}
+                    </td>
+
+                    <td class="py-3 pr-3">
+                        ${item.notes || "-"}
+                    </td>
+
+                    <td class="py-3 pr-3 text-xs">
+                        ${staff}
+                    </td>
+
+                    <td class="py-3 text-xs">
+                        ${date}
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("")
+        : `
+            <tr>
+                <td colspan="7"
+                    class="text-center py-8 text-slate-400">
+                    No inventory movements recorded yet.
+                </td>
+            </tr>
+        `;
+
     return;
-  }
+}
 
-  if ((v.rx[index].dispenseStatus || "Pending") !== "Pending") {
-    alert("This item has already been processed.");
-    return;
-  }
+} // End of renderPharmacy()
 
-  const updatedItems = v.rx.map((item, i) =>
-    i === index
-      ? { ...item, dispenseStatus: "Unavailable" }
-      : item
-  );
 
-  const remaining = updatedItems.some(
-    (item) => item.dispenseStatus === "Pending"
-  );
+// ==========================================
+// PHARMACY INVENTORY EDIT FORM
+// ==========================================
 
-  updateVisit(id, {
-    rx: updatedItems,
-    status: remaining ? "At pharmacy" : "Done"
-  });
+function openPharmacyEditModal(type, item) {
 
-  renderPharmacy();
+    document.getElementById("pharm-edit-id").value = item.id;
+
+    document.getElementById("pharm-edit-type").value = type;
+
+    document.getElementById("pharm-edit-name").value =
+        item.name || "";
+
+    document.getElementById("pharm-edit-strength").value =
+        item.strength || "";
+
+    document.getElementById("pharm-edit-form").value =
+        item.dosage_form || "";
+
+    document.getElementById("pharm-edit-expiry").value =
+        item.expiry_date || "";
+
+    document.getElementById("pharm-edit-main").value =
+        item.main ?? 0;
+
+    document.getElementById("pharm-edit-active").value =
+        item.active ?? 0;
+
+    document.getElementById("pharm-edit-dispensary").value =
+        item.dispensary ?? 0;
+
+    const medicineFields =
+        document.getElementById("pharm-edit-medicine-fields");
+
+    medicineFields.classList.toggle(
+        "hidden",
+        type !== "Medicine"
+    );
+
+    document.getElementById("pharm-edit-title").textContent =
+        type === "Medicine"
+            ? "Edit Medicine"
+            : "Edit Medical Supply";
+
+    document.getElementById("pharm-edit-modal")
+        .classList.remove("hidden");
+
+    document.body.classList.add("overflow-hidden");
+}
+
+
+function closePharmacyEditModal() {
+
+    document.getElementById("pharm-edit-modal")
+        .classList.add("hidden");
+
+    document.getElementById("pharm-edit-form").reset();
+
+    document.body.classList.remove("overflow-hidden");
+}
+
+
+// ==========================================
+// EDIT MEDICINE
+// ==========================================
+
+async function editMedicine(id) {
+
+    const { data: medicine, error } = await supabaseClient
+        .from("medicines")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (error || !medicine) {
+
+        console.error("Medicine loading error:", error);
+
+        alert("Unable to load medicine details.");
+
+        return;
+    }
+
+    openPharmacyEditModal("Medicine", medicine);
+}
+
+
+// ==========================================
+// EDIT MEDICAL SUPPLY
+// ==========================================
+
+async function editSupply(id) {
+
+    const { data: supply, error } = await supabaseClient
+        .from("medical_supplies")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (error || !supply) {
+
+        console.error("Supply loading error:", error);
+
+        alert("Unable to load medical supply details.");
+
+        return;
+    }
+
+    openPharmacyEditModal("Supply", supply);
+}
+
+
+// ==========================================
+// SAVE PHARMACY INVENTORY EDIT
+// ==========================================
+
+async function savePharmacyInventoryEdit(event) {
+
+    event.preventDefault();
+
+    const id =
+        document.getElementById("pharm-edit-id").value;
+
+    const type =
+        document.getElementById("pharm-edit-type").value;
+
+    const name =
+        document.getElementById("pharm-edit-name").value.trim();
+
+    const strength =
+        document.getElementById("pharm-edit-strength").value.trim();
+
+    const dosageForm =
+        document.getElementById("pharm-edit-form").value.trim();
+
+    const expiry =
+        document.getElementById("pharm-edit-expiry").value;
+
+    const main =
+        Number(document.getElementById("pharm-edit-main").value);
+
+    const active =
+        Number(document.getElementById("pharm-edit-active").value);
+
+    const dispensary =
+        Number(document.getElementById("pharm-edit-dispensary").value);
+
+    // Validate information.
+    if (!id || !name) {
+
+        alert("Please provide a valid item name.");
+
+        return;
+    }
+
+    const quantities = [main, active, dispensary];
+
+    if (
+        quantities.some(q =>
+            !Number.isInteger(q) || q < 0
+        )
+    ) {
+
+        alert("Quantities must be whole numbers and cannot be negative.");
+
+        return;
+    }
+
+    if (type === "Medicine" && (!strength || !dosageForm)) {
+
+        alert("Please enter the medicine strength and dosage form.");
+
+        return;
+    }
+
+    const updateData = {
+
+        name: name,
+
+        expiry_date: expiry || null,
+
+        main: main,
+
+        active: active,
+
+        dispensary: dispensary,
+
+        quantity: main + active + dispensary
+
+    };
+
+    const table = type === "Medicine"
+        ? "medicines"
+        : "medical_supplies";
+
+    if (type === "Medicine") {
+
+        updateData.strength = strength;
+
+        updateData.dosage_form = dosageForm;
+
+    } else if (type !== "Supply") {
+
+        alert("Invalid inventory item.");
+
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from(table)
+        .update(updateData)
+        .eq("id", id);
+
+    if (error) {
+
+        console.error("Inventory update error:", error);
+
+        alert("Unable to update inventory.");
+
+        return;
+    }
+
+    closePharmacyEditModal();
+
+    alert("Inventory updated successfully.");
+
+    await renderPharmacy();
+}        
+
+
+// ==========================================
+// DISPENSE PRESCRIPTION
+// ==========================================
+
+async function dispensePrescription(id) {
+
+    const confirmed = confirm(
+        "Are you sure you want to dispense this prescription?"
+    );
+
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient.rpc(
+        "dispense_pharmacy_prescription",
+        {
+            p_prescription_id: id
+        }
+    );
+
+    if (error) {
+        console.error("Dispensing error:", error);
+        alert(error.message || "Unable to dispense prescription.");
+        return;
+    }
+
+    alert("Prescription dispensed successfully.");
+
+    await renderPharmacy();
+    await updatePharmacySummary();
+}
+
+
+// ==========================================
+// MARK PRESCRIPTION UNAVAILABLE
+// ==========================================
+
+async function markPrescriptionUnavailable(id) {
+
+    const confirmed = confirm(
+        "Are you sure this prescription item is unavailable?"
+    );
+
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient.rpc(
+        "mark_pharmacy_prescription_unavailable",
+        {
+            p_prescription_id: id
+        }
+    );
+
+    if (error) {
+        console.error("Prescription update error:", error);
+        alert(error.message || "Unable to update prescription.");
+        return;
+    }
+
+    alert("Prescription marked as unavailable.");
+
+    await renderPharmacy();
+    await updatePharmacySummary();
+}
+
+
+// ==========================================
+// UPDATE RESTOCK ITEMS
+// ==========================================
+
+async function updateRestockItems() {
+
+    const type = document.getElementById("restock-type").value;
+
+    const itemSelect = document.getElementById("restock-item");
+
+    if (!itemSelect) return;
+
+    itemSelect.innerHTML =
+        '<option value="">Loading items...</option>';
+
+    const table = type === "Medicine"
+        ? "medicines"
+        : "medical_supplies";
+
+    const { data, error } = await supabaseClient
+        .from(table)
+        .select("id, name")
+        .eq("is_active", true)
+        .order("name");
+
+    if (error) {
+        console.error("Restock items loading error:", error);
+
+        itemSelect.innerHTML =
+            '<option value="">Unable to load items</option>';
+
+        return;
+    }
+
+    itemSelect.innerHTML =
+        '<option value="">Select an item</option>';
+
+    (data || []).forEach(item => {
+
+        const option = document.createElement("option");
+
+        option.value = item.id;
+        option.textContent = item.name;
+
+        itemSelect.appendChild(option);
+
+    });
+}
+
+
+// ==========================================
+// SAVE RESTOCK
+// ==========================================
+
+async function saveRestock(event) {
+
+    event.preventDefault();
+
+    const type = document.getElementById("restock-type").value;
+
+    const itemId = document.getElementById("restock-item").value;
+
+    const store = document.getElementById("restock-store").value;
+
+    const quantity = Number(
+        document.getElementById("restock-quantity").value
+    );
+
+    if (!itemId || !Number.isInteger(quantity) || quantity <= 0) {
+
+        alert("Please select an item and enter a valid quantity.");
+
+        return;
+    }
+
+    const { error } = await supabaseClient.rpc(
+        "restock_pharmacy_inventory",
+        {
+            p_item_type: type,
+            p_item_id: itemId,
+            p_store: store,
+            p_quantity: quantity
+        }
+    );
+
+    if (error) {
+
+        console.error("Restock error:", error);
+
+        alert(error.message || "Unable to restock inventory.");
+
+        return;
+    }
+
+    alert("Stock added successfully.");
+
+    document.getElementById("restock-form").reset();
+
+    closeRestockForm();
+
+    await updateRestockItems();
+
+    await renderPharmacy();
+
+    await updatePharmacySummary();
 }
 
 // Opens the restock form
@@ -686,61 +1439,96 @@ function closeAddMedicineForm() {
 }
 
 
-function saveNewMedicine(event) {
-  event.preventDefault();
+async function saveNewMedicine(event) {
+    event.preventDefault();
 
-  const name = document.getElementById("new-medicine-name").value.trim();
-  const strength = document.getElementById("new-medicine-strength").value.trim();
-  const form = document.getElementById("new-medicine-form").value;
-  const expiry = document.getElementById("new-medicine-expiry").value;
+    const name = document.getElementById("new-medicine-name").value.trim();
+    const strength = document.getElementById("new-medicine-strength").value.trim();
+    const form = document.getElementById("new-medicine-form").value;
+    const expiry = document.getElementById("new-medicine-expiry").value;
 
-  const main = Number(document.getElementById("new-medicine-main").value);
-  const active = Number(document.getElementById("new-medicine-active").value);
-  const dispensary = Number(document.getElementById("new-medicine-dispensary").value);
+    const main = Number(document.getElementById("new-medicine-main").value);
+    const active = Number(document.getElementById("new-medicine-active").value);
+    const dispensary = Number(document.getElementById("new-medicine-dispensary").value);
 
-  if (!name || !strength || !form) {
-    alert("Please complete all required medicine details.");
-    return;
-  }
+    // Validate required information.
+    if (!name || !strength || !form) {
+        alert("Please complete all required medicine details.");
+        return;
+    }
 
-  const db = loadDB();
-  const drugs = Array.isArray(db.drugs) ? db.drugs : [];
+    // Validate quantities.
+    if (
+        !Number.isFinite(main) ||
+        !Number.isFinite(active) ||
+        !Number.isFinite(dispensary) ||
+        main < 0 ||
+        active < 0 ||
+        dispensary < 0
+    ) {
+        alert("Please enter valid medicine quantities.");
+        return;
+    }
 
-  const fullName = `${name} ${strength}`;
+    const fullQuantity = main + active + dispensary;
 
-  const alreadyExists = drugs.some(
-    (drug) => drug.name.toLowerCase() === fullName.toLowerCase()
-  );
+    // Check whether this medicine already exists.
+    const { data: existingMedicine, error: checkError } =
+        await supabaseClient
+            .from("medicines")
+            .select("id")
+            .eq("name", name)
+            .eq("strength", strength)
+            .maybeSingle();
 
-  if (alreadyExists) {
-    alert("This medicine already exists in the inventory.");
-    return;
-  }
+    if (checkError) {
+        console.error("Medicine duplicate check error:", checkError);
+        alert("Unable to check existing medicines.");
+        return;
+    }
 
-  const newMedicine = {
-    name: fullName,
-    form: form,
-    main: main,
-    active: active,
-    dispensary: dispensary,
-    expiry: expiry,
-     isActive: true
-  };
+    if (existingMedicine) {
+        alert("This medicine already exists in the inventory.");
+        return;
+    }
 
-  drugs.push(newMedicine);
+    // Prepare medicine record.
+    const newMedicine = {
+        name: name,
+        strength: strength,
+        dosage_form: form,
+        quantity: fullQuantity,
+        reorder_level: 10,
+        expiry_date: expiry || null,
+        main: main,
+        active: active,
+        dispensary: dispensary,
+        is_active: true
+    };
 
-  db.drugs = drugs;
-  saveDB(db);
+    // Save medicine to Supabase.
+    const { data, error } = await supabaseClient
+        .from("medicines")
+        .insert([newMedicine])
+        .select()
+        .single();
 
-  event.target.reset();
+    if (error) {
+        console.error("Medicine saving error:", error);
+        alert("Unable to save medicine. Check the console for details.");
+        return;
+    }
 
-  closeAddMedicineForm();
-  renderPharmacy();
-  updatePharmacySummary();
+    // Clear and close the form.
+    event.target.reset();
 
-  alert("New medicine added successfully.");
+    closeAddMedicineForm();
+
+    // Refresh inventory and summary.
+    await renderPharmacy();
+
+    alert("New medicine added successfully.");
 }
-
 
 
 function openAddSupplyForm() {
@@ -762,171 +1550,106 @@ function closeAddSupplyForm() {
 }
 
 
-function saveNewSupply(event) {
-  event.preventDefault();
+async function saveNewSupply(event) {
+    event.preventDefault();
 
-  const name = document
-    .getElementById("new-supply-name")
-    .value.trim();
+    const name = document
+        .getElementById("new-supply-name")
+        .value.trim();
 
-  const expiry = document
-    .getElementById("new-supply-expiry")
-    .value;
+    const expiry = document
+        .getElementById("new-supply-expiry")
+        .value;
 
-  const main = Number(
-    document.getElementById("new-supply-main").value
-  );
-
-  const active = Number(
-    document.getElementById("new-supply-active").value
-  );
-
-  const dispensary = Number(
-    document.getElementById("new-supply-dispensary").value
-  );
-
-  if (!name) {
-    alert("Please enter the supply name.");
-    return;
-  }
-
-  const db = loadDB();
-
-  const supplies = Array.isArray(db.supplies)
-    ? db.supplies
-    : [];
-
-  const alreadyExists = supplies.some(
-    (supply) =>
-      supply.name.toLowerCase() === name.toLowerCase()
-  );
-
-  if (alreadyExists) {
-    alert("This medical supply already exists in the inventory.");
-    return;
-  }
-
-  const newSupply = {
-    name: name,
-    main: main,
-    active: active,
-    dispensary: dispensary,
-    expiry: expiry,
-     isActive: true
-  };
-
-  supplies.push(newSupply);
-
-  db.supplies = supplies;
-  saveDB(db);
-
-  event.target.reset();
-
-  closeAddSupplyForm();
-  renderPharmacy();
-  updatePharmacySummary();
-
-  alert("New medical supply added successfully.");
-}
-
-
-
-function updateRestockItems() {
-  const type = document.getElementById("restock-type").value;
-  const itemSelect = document.getElementById("restock-item");
-
-  if (!itemSelect) return;
-
-  let items = [];
-
-  if (type === "Medicine") {
-    items = getDrugs();
-  } else {
-    items = getSupplies();
-  }
-
-  itemSelect.innerHTML = '<option value="">Select an item</option>';
-
-  items.forEach((item) => {
-    const option = document.createElement("option");
-    option.value = item.name;
-    option.textContent = item.name;
-    itemSelect.appendChild(option);
-  });
-}
-
-function saveRestock(event) {
-  event.preventDefault();
-
-  const type = document.getElementById("restock-type").value;
-  const itemName = document.getElementById("restock-item").value;
-  const store = document.getElementById("restock-store").value;
-  const quantity = Number(document.getElementById("restock-quantity").value);
-
-  if (!itemName || !Number.isInteger(quantity) || quantity <= 0) {
-    alert("Please select an item and enter a valid quantity.");
-    return;
-  }
-
-  const storeField = {
-    main: "main",
-    active: "active",
-    dispensary: "dispensary"
-  }[store];
-
-  let updated = false;
-
-  if (type === "Medicine") {
-    const drug = getDrugs().find(
-      (item) => item.name === itemName
+    const main = Number(
+        document.getElementById("new-supply-main").value
     );
 
-    if (drug) {
-      updated = updateDrugByName(itemName, {
-        [storeField]: Number(drug[storeField] || 0) + quantity
-      });
-    }
-  } else {
-    const supply = getSupplies().find(
-      (item) => item.name === itemName
+    const active = Number(
+        document.getElementById("new-supply-active").value
     );
 
-    if (supply) {
-      updated = updateSupplyByName(itemName, {
-        [storeField]: Number(supply[storeField] || 0) + quantity
-      });
+    const dispensary = Number(
+        document.getElementById("new-supply-dispensary").value
+    );
+
+    // Validate supply name.
+    if (!name) {
+        alert("Please enter the supply name.");
+        return;
     }
-  }
 
-  if (!updated) {
-    alert("Could not update stock. Please check the selected item.");
-    return;
-  }
+    // Validate quantities.
+    if (
+        !Number.isFinite(main) ||
+        !Number.isFinite(active) ||
+        !Number.isFinite(dispensary) ||
+        main < 0 ||
+        active < 0 ||
+        dispensary < 0
+    ) {
+        alert("Please enter valid supply quantities.");
+        return;
+    }
 
-  // Save the restock transaction to the database.
-  const db = loadDB();
+    // Check for an existing supply.
+    const { data: existingSupply, error: checkError } =
+        await supabaseClient
+            .from("medical_supplies")
+            .select("id")
+            .ilike("name", name)
+            .maybeSingle();
 
-  if (!Array.isArray(db.restockHistory)) {
-    db.restockHistory = [];
-  }
+    if (checkError) {
+        console.error("Supply duplicate check error:", checkError);
+        alert("Unable to check existing medical supplies.");
+        return;
+    }
 
-  db.restockHistory.push({
-    id: Date.now(),
-    type: type,
-    itemName: itemName,
-    quantity: quantity,
-    store: store,
-    date: new Date().toISOString()
-  });
+    if (existingSupply) {
+        alert("This medical supply already exists in the inventory.");
+        return;
+    }
 
-  saveDB(db)
+    // Calculate total quantity.
+    const totalQuantity = main + active + dispensary;
 
-  alert("Stock added successfully.");
+    // Prepare supply record.
+    const newSupply = {
+        name: name,
+        quantity: totalQuantity,
+        reorder_level: 10,
+        expiry_date: expiry || null,
+        main: main,
+        active: active,
+        dispensary: dispensary,
+        is_active: true
+    };
 
-  document.getElementById("restock-form").reset();
-  updateRestockItems();
-  closeRestockForm();
-  renderPharmacy();
+    // Save to Supabase.
+    const { data, error } = await supabaseClient
+        .from("medical_supplies")
+        .insert([newSupply])
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Supply saving error:", error);
+        alert("Unable to save medical supply. Check the console.");
+        return;
+    }
+
+    // Reset and close form.
+    event.target.reset();
+
+    closeAddSupplyForm();
+
+    await renderPharmacy();
+
+    alert("New medical supply added successfully.");
 }
+
+
+
 
 

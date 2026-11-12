@@ -239,21 +239,7 @@ function addToQueue(patient, priority) {
   return newVisit;
 }
 
-// function addToQueue(patient, priority) {
-//   const db = loadDB();
-//   db.visits.push({
-//     id: Date.now() + "-" + Math.random().toString(16).slice(2),
-//     clinicNumber: patient.clinicNumber, 
-//     name: patient.name, 
-//     sex: patient.sex, // storing gender
-//     age: calculateAge(patient.dob), // storing age with automati
-//     priority,
-//     status: "Waiting", 
-//     time: Date.now(),
-//     vitals: null, complaint: "", diagnosis: "", lab: null, rx: [],
-//   });
-//   saveDB(db);
-// }
+
 
 // Emergency first, then first-come-first-served — matches the Nurse's real process.
 function getVisitsByStatus(status) {
